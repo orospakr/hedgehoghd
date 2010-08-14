@@ -1,0 +1,17 @@
+*** HedgehogHD implementation notes ***
+
+** Original MD Sonic engine behaviour **
+
+* Level construction *
+
+* Collision *
+
+16x16 blocks, w/ image bitmap.
+
+Each 16x16 block gets a 16 *byte* collision map, which describes an edge. Therefore, each row of 16 px gets a byte.  Only 8 bits, but 16 pixels.  Five bits of that byte from the right is a value between and including 0 and 16, which count the amount of filled in space up to the edge, in the Y dimension.  In the event that the filling in should occur from top to bottom instead, the first four bits are always on.  Note that means the fifth bit from the right -- originally allocated so that a total of 17 values could be given in the height field -- is also always on in this case.  Except for that extra 16, these bits count the amount of negative space (again, in the Y dimension) up to where filling in begins.
+
+** References **
+
+http://stephenuk.hacking-cult.org/SCHG/General/CollisionFormat/CollisionFormat.htm
+http://forums.sonicretro.org/index.php?showtopic=3095
+http://info.sonicretro.org/SCHG:Sonic_2/Level_Editing

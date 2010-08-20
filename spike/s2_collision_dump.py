@@ -10,7 +10,9 @@ import os.path
 
 # outputs a simple SVG file containing separate path elements for each
 # of these collision block shapes.
-print("usage: %s <collision_dump> <svg_output_dir>" % sys.argv[0])
+if(len(sys.argv) != 3):
+    print("usage: %s <collision_dump> <svg_output_dir>" % sys.argv[0])
+    exit(-1)
 
 fn = sys.argv[1]
 fs = os.stat(fn).st_size

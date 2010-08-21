@@ -4,6 +4,16 @@
 
 * Level construction *
 
+originally thought $80(width) x $2 (foreground, background) x $40 (height), but that seems to make every act consume 16K.
+
+all of the separate level map blocks separately binclude'd decompress to 32K.
+
+some of them have only a single "normal" level, like ARZ.  Yet, some, like MTZ with its three zones, is also 32K.  Worse, the files all seem to have believable data all the way through them, with no particularly obvious awkward empty bits/padding.
+
+EHZ and HTZ share one.  Yes, also 32K.
+
+Apparently S2 *does* have fixed level sizes (according to a dude on IRC, who knows how apocryphal that is)
+
 * Collision *
 
 16x16 blocks, w/ image bitmap.

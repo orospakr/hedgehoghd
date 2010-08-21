@@ -16,21 +16,37 @@ mfd = open(mfn, "rb")
 if((mfs % 128) != 0):
     print("Inappropriately sized 128x128 block mapping: %d" % mfs)
 
-print "There are %d rows." % (mfs / 128)
+if((mfs / 128 / 2) != 16):
+    print "Sonic 2 levels always have 16 rows. This has: %d" % (mfs / 128 / 2)
+    exit(-1)
 
 # 256 rows for both EHZ and HTZ
 # 128 rows per zone
 # 64 rows per act, so 32 (0x20) actual rows (foreground/background interlacing
 # so, the problem is that I was assuming.
 
-skip = False
+foreground = []
+background = []
 
 for y in range(0, mfs / 128):
     row = mfd.read(128)
+    if((y % 2) == 0):
+        foreground.append(row)
+    else:
+        background.append(row)
+
+print "Foreground:"
+for row in foreground:
     result = ""
     for block in row:
         result += "%02x " % struct.unpack('B', block)[0]
-    print result
+    print(result)
 
+print "Background:"
+for row in background:
+    result = ""
+    for block in row:
+        result += "%02x " % struct.unpack('B', block)[0]
+    print(result)
 
 mfd.close()

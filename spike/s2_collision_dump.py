@@ -23,8 +23,6 @@ if(not os.path.isdir(svg_dir)):
     print("<svg_output_dir> needs to be a directory.")
     exit(-1)
 
-
-
 if((fs % 16) != 0):
     print("Inappropriately sized file for a Sonic collision map: %d" % fs)
     exit()

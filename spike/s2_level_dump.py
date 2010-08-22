@@ -5,7 +5,7 @@ import os
 import struct
 
 if(len(sys.argv) != 2):
-    print("usage: %s <sonic 2 128x128 block mapping>" % sys.argv[0])
+    print("usage: %s <sonic 2 level map>" % sys.argv[0])
     exit(-1)
 
 mfn = sys.argv[1]
@@ -14,7 +14,7 @@ mfs = os.stat(mfn).st_size
 mfd = open(mfn, "rb")
 
 if((mfs % 128) != 0):
-    print("Inappropriately sized 128x128 block mapping: %d" % mfs)
+    print("Inappropriately sized level map: %d" % mfs)
 
 if((mfs / 128 / 2) != 16):
     print "Sonic 2 levels always have 16 rows. This has: %d" % (mfs / 128 / 2)

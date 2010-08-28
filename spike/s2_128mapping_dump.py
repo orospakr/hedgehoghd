@@ -34,6 +34,7 @@ for block in range(0, blocks):
         print "whatsdfaf?"
         exit(-1)
 #    print(repr(values))
+    max_index = 0
     for r in range(0, 8):
         result = ""
         row_offset = r * 8
@@ -53,6 +54,9 @@ for block in range(0, blocks):
             tile_index = column & 0x3FF
             y_flipped = (column & 800)
             x_flipped = (column & 400)
+
+            if(tile_index > max_index):
+                max_index = tile_index
             
             if(alternate_collision > 3):
                 print "WTF"
@@ -71,7 +75,10 @@ for block in range(0, blocks):
                 flip_text += "X"
             else:
                 flip_text += "_"
-            index_result += "%03x " % tile_index
+            if(tile_index == 0):
+                index_result += "___ "
+            else:
+                index_result += "%03x " % tile_index
             alternate_result += "%01x " % alternate_collision
             normal_result += "%01x " % normal_collision
             flip_result += "%s " % flip_text
@@ -87,3 +94,6 @@ for block in range(0, blocks):
         # print result
 
     print "..."
+
+print "Done."
+print "Greatest tile index seen: 0x%x" % max_index

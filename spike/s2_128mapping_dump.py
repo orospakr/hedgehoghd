@@ -42,6 +42,7 @@ for block in range(0, blocks):
         alternate_result = ""
         normal_result  = ""
         index_result = ""
+        flip_result = ""
 
         # SSTT YXII IIII IIII
         for column in current_row:
@@ -70,11 +71,12 @@ for block in range(0, blocks):
                 flip_text += "X"
             else:
                 flip_text += "_"
-            index_result += "%03x:%s " % (tile_index, flip_text)
+            index_result += "%03x " % tile_index
             alternate_result += "%01x " % alternate_collision
             normal_result += "%01x " % normal_collision
+            flip_result += "%s " % flip_text
 
-        print index_result + "    " + alternate_result + "   " + normal_result
+        print index_result + "   " + alternate_result + "   " + normal_result + "   "  + flip_result
 
         # if(len(current_row) != 16):
         #     print("Huh? Array slice wrong?! %d" % len(current_row))

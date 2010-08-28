@@ -39,10 +39,43 @@ for block in range(0, blocks):
         row_offset = r * 8
 
         current_row = values[row_offset:row_offset+8]
-        print(repr(current_row))
+        alternate_result = ""
+        normal_result  = ""
+        index_result = ""
 
+        # SSTT YXII IIII IIII
         for column in current_row:
-            background_colision = column & 0xC00
+            # what the heck are primary and alternate collision? is it what makes loops work?  pretty sure it's separate from foreground and
+            # background, since these blocks are mapped into foreground and background separately
+            alternate_collision = (column & 0xC000) >> 14
+            normal_collision = (column & 0x3000) >> 12
+            tile_index = column & 0x3FF
+            y_flipped = (column & 800)
+            x_flipped = (column & 400)
+            
+            if(alternate_collision > 3):
+                print "WTF"
+                exit(-1)
+            if(normal_collision > 3):
+                print "WETRDSFDSAF"
+                exit(-1)
+
+            
+            flip_text = ""
+            if(y_flipped):
+                flip_text += "Y"
+            else:
+                flip_text += "_"
+            if(x_flipped):
+                flip_text += "X"
+            else:
+                flip_text += "_"
+            index_result += "%03x:%s " % (tile_index, flip_text)
+            alternate_result += "%01x " % alternate_collision
+            normal_result += "%01x " % normal_collision
+
+        print index_result + "    " + alternate_result + "   " + normal_result
+
         # if(len(current_row) != 16):
         #     print("Huh? Array slice wrong?! %d" % len(current_row))
         #     exit(-1)

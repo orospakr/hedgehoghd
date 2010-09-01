@@ -1,160 +1,92 @@
 #!/usr/bin/env python
-
-# attempt at porting libkens' Kosinski decompressor to Python.
-# doesn't work at all.
-
 import sys
-import struct
 import array
+import struct
 
-import hashlib
+def decompress_file(path):
+    c_fd = open(sys.argv[1], "rb")
+    compressed = array.array('B', c_fd.read())
+    c_fd.close()
+    return decompress_block(compressed)
 
-c_fd = open(sys.argv[1], "rb")
-
-
-uncompressed = array.array('B')
-
-#	fseek(Src, Location, SEEK_SET);
-
-	# if (Moduled)
-	# {
-	# 	fread(&High, 1, 1, Src);
-	# 	fread(&Low, 1, 1, Src);
-	# 	FullSize = ((long)High << 8) + (long)Low;
-	# }
-
-# start:
-
-
-BITFIELD = 0
-def read_word():
-    val = c_fd.read(2)
-    if(len(val) != 2):
-        print "Not enough data left to read a word!"
+def reverse(byte):
+    if(byte > 0xff):
+        print "That isn't a byte: %d" % byte
         exit(-1)
-    return struct.unpack('<H', val)[0]
+    result = 0
+    for i in range(0, 8):
+        bit = (byte & (2 ** i)) / (2 ** i)
+        result += bit * (2 ** (7-i))
+    return result
 
-def read_byte():
-    val = c_fd.read(1)
-    if(len(val) != 1):
-        print "Not enough data left to read a byte!"
-        exit(-1)
-    return struct.unpack('B', val)[0]
+def decompress_block(compressed):
+    uncompressed = array.array('B')
+    print "Decompressing block: %s" % len(compressed)
 
-BFP = 0
-Bit = 0
-Byte = 0
-Low = 0
-High = 0
-Pointer = 0
-Count = 0
-Offset = 0
-FullSize = 0
-DecBytes = 0
+    # descriptor block
+    descriptor_high = reverse(compressed[0])
+    descriptor_low = reverse(compressed[1])
+    # compressed[2] and after are all data block
 
 
-# ------------------------------------------------------------------------------------------------
-while(True):
-#    print "GO!"
-    if(BITFIELD & (1<<BFP)):
-        Bit=1
-    else:
-        Bit=0
-    BFP += 1
-    if (BFP>=16):
-        BITFIELD = read_word()
-        BFP=0
+    descriptor = struct.unpack('>H', array.array('B', [descriptor_high, descriptor_low]).tostring())[0]
+    print "READ BACK DESCRIPTOR: %x" % descriptor
 
-# -- Direct Copy ---------------------------------------------------------------------------------
-    if (Bit):
-        print "Direct Copy!"
-        Byte = read_byte()
-        uncompressed.fromstring(struct.pack('B', Byte))
-        DecBytes+=1
-
-    else:
-        if(BITFIELD & (1<<BFP)):
-            Bit=1
+    data_position = 0
+    position = 0
+    while(position < 16):
+        descriptor_position = 15 - position
+        print "%d:%d" % (position, descriptor_position)
+        if(descriptor & (2 ** descriptor_position)):
+            print "uncompressed"
+            print "... appending value: 0x%x" % compressed[2 + data_position]
+            uncompressed.append(compressed[2 + data_position])
+            position += 1
+            data_position += 1
         else:
-            Bit=0
-        BFP += 1
-        if (BFP>=16):
-            BITFIELD = read_word()
-            BFP=0
-# -- Embedded / Separate RLE ---------------------------------------------------------------------
-        if (Bit):
-            print "Embedded/Separate"
-            Low = read_byte()
-            High = read_byte()
-#            fread(&Low, 1, 1, Src);
-#            fread(&High, 1, 1, Src);
+            print "run-length"
+            # Run-length, now to determine which type
+            if(descriptor & (2 ** (descriptor_position - 1))):
+                # separate RLE
+                print "... separate RLE"
+                position += 2
+                # data_position +=
+            else:
+                # inline RLE
+                print "... inline RLE"
+                first_length_bit = (descriptor & (2 ** (descriptor_position - 2))) / 2 ** (descriptor_position - 2)
+                second_length_bit = (descriptor & (2 ** (descriptor_position - 3))) / 2 ** (descriptor_position - 3)
+                print "first length bit: %d, second length bit: %d" % (first_length_bit, second_length_bit)
+                length_to_copy = (first_length_bit * 2) + (second_length_bit) + 2 # + 2 because format calls for it.
+#                length_to_copy = ((descriptor & (2 ** descriptor_position)) * 2) + (descriptor & (2 ** descriptor_position + 3)) + 2
+                offset_to_copy_from = (compressed[2 + data_position]) - 256
+                uncompressed_src_pos = offset_to_copy_from + len(uncompressed)
 
-            Count= High & 0x07
-
-            if (Count==0):
-                Count = read_byte()
-                if (Count==0):
-                    # finished
-                    print "Huh, empty Kosinksi file? (or next module, or something)"
-                    break
+                print "Okay! Inline RLE block params: length_to_copy: %d, offset_to_copy_from: %d, uncompressed_src_pos: %d" % (length_to_copy, offset_to_copy_from, uncompressed_src_pos)
                 
-                if (Count==1):
-                    print "Count 1, apparently iterate again..."
-                    continue
-            else:
-                Count+=1
-        
-            Offset = 0xFFFFE000 | ((0xF8 & High) << 5) | Low
-  
-# -- Inline RLE -----------------------------------------------------------------------------------
-        else:
-            print "Inline!"
-            if(BITFIELD & (1<<BFP)):
-                Low=1
-            else:
-                Low=0
-            BFP += 1
-            if (BFP>=16):
-                BITFIELD = read_word()
-                BFP=0
-            if(BITFIELD & (1<<BFP)):
-                High=1
-            else:
-                High=0
-            BFP += 1
-            if (BFP>=16):
-                BITFIELD = read_word()
-                BFP=0
+                for i in range(0, length_to_copy):
+                    current_pos_to_copy = (uncompressed_src_pos + i) % abs(offset_to_copy_from) # repeat the pattern for as many bytes as are needed
+                    uncompressed.append(uncompressed[current_pos_to_copy])
+                position += 4 # inline RLE bits
+                data_position += 1 # the offset byte we read back
 
-                Count = (Low)*2 + (High) + 1
-                # EOF seems to get noticed here.  original code seems to do nothing.
-                # how the fuck does the original code even realize that its time to terminate...?
-                Offset = read_byte()
-                Offset |= 0xFFFFFF00
-        # read a byte from uncompressed data at Offset from current pos
-        # return uncompressed data to current position
-        # write that byte to the current uncompressed position. (incremement currentpos)
-        for i in range(0, Count):
-            source_pos = (len(uncompressed) - 1) + Offset + i
-            print "Attempting to get value from %d, current length is %d" % (source_pos, len(uncompressed))
-            uncompressed.append(uncompressed[source_pos])
+    # if((len(compressed) % 16) != 0):
+    #     print "Not a valid Kosinski compressed file.  Length should be a multiple of 16."
+    #     exit(-1)
+    
+    return uncompressed
 
-        DecBytes+=Count+1
-# ------------------------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------------------------
+#while(True):
+    # read back
 
-print "ALL DONE!"
 
-print hashlib.sha1sum(uncompressed.tostring()).hexdigest()
-# end:
-	# if (Moduled)
-	# {
-	# 	if (DecBytes < FullSize)
-	# 	{
-	# 		do { fread(&Byte, 1, 1, Src); } while (Byte==0);
-	# 		fseek(Src, -1, SEEK_CUR);
-	# 		goto start;
-	# 	}
-	# }
-# fclose(Dst);
-c_fd.close()
+#descriptor_high, descriptor_low = struct.unpack('B', descriptor)
+
+#print "H: %02x L: %02x" % (descriptor_high, descriptor_low)
+
+# OOZ_1.bin should be 844dcc5e3a58902c16a682ae22c800d7dd3158cb
+if __name__ == '__main__':
+    import hashlib
+    result = decompress_file(sys.argv[1])
+    print hashlib.sha1(result.tostring()).hexdigest()
+

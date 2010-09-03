@@ -4,7 +4,7 @@ import spike.kosinski
 
 class KosinskiTest(unittest.TestCase):
     def setUp(self):
-        self.kos = spike.kosinski.Kosinksi()
+        self.kos = spike.kosinski.Kosinski()
 
     def testByteReverse(self):
         # 11110000 -> 00001111
@@ -26,5 +26,14 @@ class KosinskiTest(unittest.TestCase):
 
         self.assertEquals([0x25, 0x25, 0x25, 0x25, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B], self.kos.uncompressed.tolist())
 
-    def testSimpleSeparateRLE(self):
-        pass
+    # rather than decompressing only a single block, verify that we can process a stream of blocks and notice when it ends
+    # 0x02, 0x00 (descriptor with only a 01 separate RLE indicator) followed by three null bytes (null separate RLE indicator which means EOS) is a simple byte-aligned EOS
+    def testStream(self):
+        self.kos.decompress(array.array('B',[0xF1, 0xFF, 0x25, 0xFF, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x02, 0x00, 0x00, 0x00, 0x00]), -1)
+        self.assertEquals([0x25, 0x25, 0x25, 0x25, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B], self.kos.uncompressed.tolist())
+
+    # def testStreamWithSeparateRLE(self):
+    #     self.kos.decompress[FF 3F 54 3B C4 44 54 33 33 5B 2D 5C 44 5C C4 C5 FC 15 FE C3 44 78 88 98 44 30 FF FF 00 F8 00]
+
+    #     [54 3B C4 44 54 33 33 5B 2D 5C 44 5C C4 C5 C4 C5 C3 44 78 88 98 44 30 30 30 30 30 30 30 30 30 30]
+

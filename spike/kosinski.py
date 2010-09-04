@@ -47,7 +47,7 @@ class Kosinski(object):
 #    Returns True if there should be more blocks to process, or False if
 #    the stream has terminated.'''
     def decompress(self, compressed = None):
-        
+
         self.uncompressed = array.array('B')
 #        if(compressed is None):
 #            compressed = self.compressed
@@ -60,7 +60,7 @@ class Kosinski(object):
 
         # offset to current descriptor block
         self.compressed_offset = 0
-        
+
         # cursor that we're reading from in the data ('B') part of the current block.  it's an offset from the end of the two descriptor bytes
         self.data_position = 0
 
@@ -71,52 +71,63 @@ class Kosinski(object):
         # contains the 16-bit value of the current descriptor.
         self.descriptor = None
 
+        self.used_bytes = 0
+
         # read a new descriptor back from the current compressed_offset.
         def read_new_descriptor():
+            self.compressed_offset += self.used_bytes
+
             descriptor_high = reverse(compressed[self.compressed_offset + 0])
             descriptor_low = reverse(compressed[self.compressed_offset + 1])
             self.descriptor = struct.unpack('>H', array.array('B', [descriptor_high, descriptor_low]).tostring())[0]
-            self.position = 0
-
             print "READ BACK DESCRIPTOR: %x" % self.descriptor
 
-        # prime ourselves with the first descriptor.
-        read_new_descriptor()
-        self.used_bytes = 2
+        def read_descriptor_bit():
+            print "%d:" % (self.position)
+            if(self.position == 0):
+                print "Position is 0, loading new descriptor."
+                read_new_descriptor()
+                self.used_bytes = 2
+                self.data_position = 0
+
+            bit = (self.descriptor & (2** (15 - self.position))) / 2 ** (15 - self.position)
+            self.position += 1
+            if(self.position > 15):
+                self.position = 0
+            return bit
+
 
         # iterate forever over descriptor bits.  they are reloaded every time all 16 bits are consumed,
         # either if they are used up normally, or when an RLE descriptor is split between two
         while(True):
-            if(self.position >= 16):
-                print "Cleanly beginning a new descriptor block!  Bytes used on last one: %d" % self.used_bytes
-                self.compressed_offset += self.used_bytes
-                read_new_descriptor()
-                self.data_position = 0
-                self.used_bytes = 2
+            # if(self.position >= 16):
+            #     print "Cleanly beginning a new descriptor block!  Bytes used on last one: %d" % self.used_bytes
+            #     self.compressed_offset += self.used_bytes
+            #     read_new_descriptor()
 
-            descriptor_position = 15 - self.position
+
+#            descriptor_position = 15 - self.position
 
             # bytes that have been consumed from the compressed_data
-            
-            print "%d:%d" % (self.position, descriptor_position)
-            if(self.descriptor & (2 ** descriptor_position)):
+
+            first_bit = read_descriptor_bit()
+            if(first_bit):
                 print "uncompressed"
                 print "... appending value: 0x%x" % compressed[self.compressed_offset + 2 + self.data_position]
                 self.uncompressed.append(compressed[self.compressed_offset + 2 + self.data_position])
-                self.position += 1
                 self.data_position += 1
                 self.used_bytes += 1
             else:
                 print "run-length"
                 # Run-length, now to determine which type
-                if(self.descriptor & (2 ** (descriptor_position - 1))):
+                if(read_descriptor_bit()):
                     # separate RLE
                     print "... separate RLE"
-                    self.position += 2 # uses two inline descriptor bits
+#                    self.position += 2 # uses two inline descriptor bits
                     first_offset_byte = compressed[self.compressed_offset + 2 + self.data_position]
                     second_offset_byte = compressed[self.compressed_offset + 2 + self.data_position + 1]
                     print "... first offset byte: %02x, second: %02x" % (first_offset_byte, second_offset_byte)
-                    
+
                     base_offset = first_offset_byte
                     factor256 = (second_offset_byte & 0xF8) / 2 ** 3
                     offset = -8192 + (factor256 * 256) + base_offset
@@ -127,6 +138,8 @@ class Kosinski(object):
                         # [LLLL LLLL] [HHHH HCCC]
                         # -8192 + HHHHH * 256 + LLLLLLLL, copy_length = CCC + 2
                         copy_count = (second_offset_byte & 0x07) + 2
+                        self.data_position += 2
+                        self.used_bytes += 2
                     else:
                         print "... with three bytes of parameters"
                         # [LLLL LLLL] [HHHH H000] [CCCC CCCC]
@@ -141,21 +154,32 @@ class Kosinski(object):
                         elif(third_offset_byte == 1):
                             print "Description block self-terminator found.  Start again!"
                         copy_count = third_offset_byte + 1
-                    
+                        self.data_position += 3
+                        self.used_bytes += 3
+
+
                     print "Okay! Separate RLE block params: offset: %d, copy_count: %d" % (offset, copy_count)
+                    uncompressed_src_pos = offset + len(self.uncompressed)
+
+                    for i in range(0, copy_count):
+                        current_pos_to_copy = uncompressed_src_pos + (i & copy_count)
+                        print "current_pos_to_copy: %d" % current_pos_to_copy
+                        print "... appending value (separate): 0x%x" % self.uncompressed[current_pos_to_copy]
+                        self.uncompressed.append(self.uncompressed[current_pos_to_copy])
+
 
                 else:
                     # inline RLE
                     print "... inline RLE"
-                    if(descriptor_position == 1):
-                        # ugh, I don't know why they bothered with this.
-                        print "oh man, the two length bits of the inline RLE descriptor are IN THE NEXT DESCRIPTOR BLOCK, argh"
-#                        read_new_descriptor()
-#                        self.position
-                    flb_mask = (2 ** (descriptor_position - 2))
-                    print "FLB MASK: %f, descriptor_position: %d" % (flb_mask, descriptor_position)
-                    first_length_bit = (self.descriptor & flb_mask) / 2 ** (descriptor_position - 2)
-                    second_length_bit = (self.descriptor & (2 ** (descriptor_position - 3))) / 2 ** (descriptor_position - 3)
+#                     if(descriptor_position == 1):
+#                         # ugh, I don't know why they bothered with this.
+#                         print "oh man, the two length bits of the inline RLE descriptor are IN THE NEXT DESCRIPTOR BLOCK, argh"
+# #                        read_new_descriptor()
+# #                        self.position
+#                    flb_mask = read_descriptor_bit() # (2 ** (descriptor_position - 2))
+#                    print "FLB MASK: %f" % (flb_mask)
+                    first_length_bit = read_descriptor_bit() # (self.descriptor & flb_mask) / 2 ** (descriptor_position - 2)
+                    second_length_bit = read_descriptor_bit() # (self.descriptor & (2 ** (descriptor_position - 3))) / 2 ** (descriptor_position - 3)
                     print "first length bit: %d, second length bit: %d" % (first_length_bit, second_length_bit)
                     length_to_copy = (first_length_bit * 2) + (second_length_bit) + 2 # + 2 because format calls for it.
                     #                length_to_copy = ((descriptor & (2 ** descriptor_position)) * 2) + (descriptor & (2 ** descriptor_position + 3)) + 2
@@ -163,19 +187,24 @@ class Kosinski(object):
                     uncompressed_src_pos = offset_to_copy_from + len(self.uncompressed)
 
                     print "Okay! Inline RLE block params: length_to_copy: %d, offset_to_copy_from: %d, uncompressed_src_pos: %d" % (length_to_copy, offset_to_copy_from, uncompressed_src_pos)
-                
+
+                    print "length of uncompressed: %d" % len(self.uncompressed)
                     for i in range(0, length_to_copy):
-                        current_pos_to_copy = (uncompressed_src_pos + i) % abs(offset_to_copy_from) # repeat the pattern for as many bytes as are needed
+
+                        current_pos_to_copy = uncompressed_src_pos + (i % length_to_copy) # repeat the pattern for as many bytes as are needed
+
+                        print "current_pos_to_copy: %d" % current_pos_to_copy
+                        print "... appending value (inline): 0x%x" % self.uncompressed[current_pos_to_copy]
                         self.uncompressed.append(self.uncompressed[current_pos_to_copy])
-                    self.position += 4 # inline RLE bits
+                    # self.position += 4 # inline RLE bits
                     self.data_position += 1 # the offset byte we read back
                     self.used_bytes += 1
 
         # if((len(compressed) % 16) != 0):
         #     print "Not a valid Kosinski compressed file.  Length should be a multiple of 16."
         #     exit(-1)
-            
-    
+
+
         # continue
         return uncompressed
 
@@ -201,4 +230,3 @@ if __name__ == '__main__':
     import hashlib
     result = decompress_file(sys.argv[1])
     print hashlib.sha1(result.tostring()).hexdigest()
-

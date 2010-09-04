@@ -131,6 +131,7 @@ class Kosinski(object):
                     base_offset = first_offset_byte
                     factor256 = (second_offset_byte & 0xF8) / 2 ** 3
                     offset = -8192 + (factor256 * 256) + base_offset
+#                    offset = 0xFFFFE000 | ((0xF8 & second_offset_byte) << 5) | first_offset_byte
 
                     copy_count = None
                     if(second_offset_byte & 0x7):
@@ -152,21 +153,24 @@ class Kosinski(object):
                             print "End of stream marker found! Goodbye."
                             return self.uncompressed
                         elif(third_offset_byte == 1):
-                            print "Description block self-terminator found.  Start again!"
+                            print "Description block self-terminator found.  Not implemented!"
+                            exit(-1)
                         copy_count = third_offset_byte + 1
                         self.data_position += 3
                         self.used_bytes += 3
-
+                    
+                    if(abs(offset) > len(self.uncompressed)):
+                        print "What?  RLE is asking for an offset past the beginning of the uncompressed data?! offset: %d, available uncomnpressed length: %d" % (offset, len(self.uncompressed))
+                        exit(-1)
 
                     print "Okay! Separate RLE block params: offset: %d, copy_count: %d" % (offset, copy_count)
                     uncompressed_src_pos = offset + len(self.uncompressed)
 
                     for i in range(0, copy_count):
                         current_pos_to_copy = uncompressed_src_pos + (i & copy_count)
-                        print "current_pos_to_copy: %d" % current_pos_to_copy
+                        print "current_pos_to_copy: %d, available_length: %d" % (current_pos_to_copy, len(self.uncompressed))
                         print "... appending value (separate): 0x%x" % self.uncompressed[current_pos_to_copy]
                         self.uncompressed.append(self.uncompressed[current_pos_to_copy])
-
 
                 else:
                     # inline RLE

@@ -158,12 +158,15 @@ class Kosinski(object):
                         copy_count = third_offset_byte + 1
                         self.data_position += 3
                         self.used_bytes += 3
-                    
-                    if(abs(offset) > len(self.uncompressed)):
-                        print "What?  RLE is asking for an offset past the beginning of the uncompressed data?! offset: %d, available uncomnpressed length: %d" % (offset, len(self.uncompressed))
-                        exit(-1)
+
+
 
                     print "Okay! Separate RLE block params: offset: %d, copy_count: %d" % (offset, copy_count)
+
+                    if((offset * -1) > len(self.uncompressed)):
+                        print "What?  Separate RLE is asking for an offset past the beginning of the uncompressed data?! offset: %d, available uncompressed length: %d" % (offset, len(self.uncompressed))
+                        exit(-1)
+
                     uncompressed_src_pos = offset + len(self.uncompressed)
 
                     for i in range(0, copy_count):
@@ -191,6 +194,10 @@ class Kosinski(object):
                     uncompressed_src_pos = offset_to_copy_from + len(self.uncompressed)
 
                     print "Okay! Inline RLE block params: length_to_copy: %d, offset_to_copy_from: %d, uncompressed_src_pos: %d" % (length_to_copy, offset_to_copy_from, uncompressed_src_pos)
+
+                    if((offset_to_copy_from * -1) > len(self.uncompressed)):
+                           print "What? Inline RLE is asking for an offset past the beginning of the uncompressed data?! offset: %d, available uncompressed data: %d" % (offset_to_copy_from, len(self.uncompressed))
+                           exit(-1)
 
                     print "length of uncompressed: %d" % len(self.uncompressed)
                     for i in range(0, length_to_copy):

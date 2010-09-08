@@ -170,7 +170,7 @@ class Kosinski(object):
                     uncompressed_src_pos = offset + len(self.uncompressed)
 
                     for i in range(0, copy_count):
-                        current_pos_to_copy = uncompressed_src_pos + (i & copy_count)
+                        current_pos_to_copy = uncompressed_src_pos + i
                         print "current_pos_to_copy: %d, available_length: %d" % (current_pos_to_copy, len(self.uncompressed))
                         print "... appending value (separate): 0x%x" % self.uncompressed[current_pos_to_copy]
                         self.uncompressed.append(self.uncompressed[current_pos_to_copy])
@@ -202,7 +202,7 @@ class Kosinski(object):
                     print "length of uncompressed: %d" % len(self.uncompressed)
                     for i in range(0, length_to_copy):
 
-                        current_pos_to_copy = uncompressed_src_pos + (i % length_to_copy) # repeat the pattern for as many bytes as are needed
+                        current_pos_to_copy = uncompressed_src_pos + i # repeat the pattern for as many bytes as are needed -- note this ends up reading back bytes appended on prior loops
 
                         print "current_pos_to_copy: %d" % current_pos_to_copy
                         print "... appending value (inline): 0x%x" % self.uncompressed[current_pos_to_copy]

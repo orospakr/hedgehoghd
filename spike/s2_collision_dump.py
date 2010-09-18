@@ -83,3 +83,5 @@ for i in range(0, fs / 16):
   </g>\n\
 </svg>')
     svg.close()
+
+print "There were %d collision blocks." % (fs/16)

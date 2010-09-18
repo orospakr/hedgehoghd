@@ -4,19 +4,14 @@
 
 * Level construction *
 
-originally thought $80(width) x $2 (foreground, background) x $40 (height), but that seems to make every act consume 16K.
+Sonic 2 level maps are 4K, Kosinski compressed.  They consist of a 128x16x2 map.  There are 128 columns, 16 rows, and 2 layers, foreground and background.  They are arranged as a sequence of rows, with foreground and background interleaved.  Each 1-byte cell addresses a 128x128 block.
 
-all of the separate level map blocks separately binclude'd decompress to 32K.
+* 128x128 blocks *
 
-some of them have only a single "normal" level, like ARZ.  Yet, some, like MTZ with its three zones, is also 32K.  Worse, the files all seem to have believable data all the way through them, with no particularly obvious awkward empty bits/padding.
 
-EHZ and HTZ share one.  Yes, also 32K.
 
-Apparently S2 *does* have fixed level sizes (according to a dude on IRC, who knows how apocryphal that is)
 
 * Collision *
-
-16x16 blocks, w/ image bitmap.
 
 Each 16x16 block gets a 16 *byte* collision map, which describes an edge. Therefore, each row of 16 px gets a byte.  Only 8 bits, but 16 pixels.  Five bits of that byte from the right is a value between and including 0 and 16, which count the amount of filled in space up to the edge, in the Y dimension.  In the event that the filling in should occur from top to bottom instead, the first four bits are always on.  Note that means the fifth bit from the right -- originally allocated so that a total of 17 values could be given in the height field -- is also always on in this case.  Except for that extra 16, these bits count the amount of negative space (again, in the Y dimension) up to where filling in begins.
 

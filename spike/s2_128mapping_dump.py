@@ -9,32 +9,37 @@ import sys
 import os
 import struct
 
+import array
+import importer.kosinski
+
 if(len(sys.argv) != 2):
     print("usage: %s <sonic 2 128x128 block map>" % sys.argv[0])
     exit(-1)
 
 bmfn = sys.argv[1]
 
-bmfs = os.stat(bmfn).st_size
+#bmfs = os.stat(bmfn).st_size
 
-if((bmfs % 128) != 0):
+bm = importer.kosinski.decompress_file(bmfn).tostring()
+
+if((len(bm) % 128) != 0):
     print("Inappropriately sized level map: %d" % bmfs)
     exit(-1)
 
-blocks = bmfs / 128
+blocks = len(bm) / 128
 
 print("There are %d blocks." % blocks)
 
-bmfd = open(bmfn, "rb")
+max_index = 0
 
 for block in range(0, blocks):
-    block_data = bmfd.read(128)
+    block_data = bm[block*128:(block*128) + 128]
     values = struct.unpack('64H', block_data)
     if(len(values) != 64):
         print "whatsdfaf?"
         exit(-1)
 #    print(repr(values))
-    max_index = 0
+
     for r in range(0, 8):
         result = ""
         row_offset = r * 8
@@ -64,7 +69,6 @@ for block in range(0, blocks):
             if(normal_collision > 3):
                 print "WETRDSFDSAF"
                 exit(-1)
-
             
             flip_text = ""
             if(y_flipped):

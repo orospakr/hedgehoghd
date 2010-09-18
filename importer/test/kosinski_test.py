@@ -4,6 +4,11 @@ import spike.kosinski
 
 TERMINATOR = [0x02, 0x00, 0x00, 0x00, 0x00]
 
+# These testcases game from http://www.segaretro.org/Kosinski_compression,
+# and they are WRONG.  Most of them assume lazy loading of new descriptors,
+# and the actual Sega implementation uses greedy loading. (took my quite a while
+# and some help to figure that one out).
+
 class KosinskiTest(unittest.TestCase):
     def setUp(self):
         self.kos = spike.kosinski.Kosinski()

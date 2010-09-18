@@ -20,11 +20,6 @@ if((mfs / 128 / 2) != 16):
     print "Sonic 2 levels always have 16 rows. This has: %d" % (mfs / 128 / 2)
     exit(-1)
 
-# 256 rows for both EHZ and HTZ
-# 128 rows per zone
-# 64 rows per act, so 32 (0x20) actual rows (foreground/background interlacing
-# so, the problem is that I was assuming.
-
 foreground = []
 background = []
 

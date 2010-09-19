@@ -38,7 +38,7 @@ for i in range(0, fs / 16):
     # create SVG file, write out header and path element.
     # we are doing this naively with strings, rather than some DOM or XML
     # based SVG lib.  call me lazy.
-    svg_filename = os.path.join(svg_dir, "%x.svg" % i)
+    svg_filename = os.path.join(svg_dir, "%03d.svg" % i)
     svg = open(svg_filename, "wb")
     svg.write('<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n\
 <svg\n\

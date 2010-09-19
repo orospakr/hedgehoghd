@@ -201,23 +201,29 @@ class Kosinski(object):
         # continue
         return uncompressed
 
-#while(True):
-    # read back
+'''Decompress Kosinski data in a file.
 
-
-#descriptor_high, descriptor_low = struct.unpack('B', descriptor)
-
-#print "H: %02x L: %02x" % (descriptor_high, descriptor_low)
-
-# OOZ_1.bin should be 844dcc5e3a58902c16a682ae22c800d7dd3158cb
-
+Returns an array.array('B') of the decompressed data.'''
 def decompress_file(path):
     c_fd = open(sys.argv[1], "rb")
     compressed = array.array('B', c_fd.read())
     c_fd.close()
     kos = Kosinski()
-    kos.decompress(compressed)
-    return kos.uncompressed
+    return kos.decompress(compressed)
+
+'''Decompress Kosinski data in a string.
+
+Returns an array.array('B') of the decompressed data.'''
+def decompress_string(data):
+    kos = Kosinski()
+    return kos.decompress(array.array('B', data))
+
+'''Decompress Kosinski data in an array.array('B').
+
+Returns an array.array('B') of the decompressed data.'''
+def decompress_array(arr):
+    kos = Kosinski()
+    return kos.decompress(arr)
 
 if __name__ == '__main__':
     import hashlib

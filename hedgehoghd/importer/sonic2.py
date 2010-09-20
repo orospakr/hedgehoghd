@@ -17,10 +17,10 @@ class CollisionArray(object):
     to do with the distinction between "primary" and "secondary" collision
     layers.
 
-    Contains many instances of CollisionTile_.
+    Contains many instances of CollisionTile.
 
     These are referenced through the per-zone collision layer
-    CollisionIndex_ instances for each Chunk_.
+    CollisionIndex instances for each Chunk.
     '''
 
     def __init__(self, data):
@@ -84,11 +84,9 @@ class Chunk(object):
     For each position in that matrix, there are:
 
     * horizontal and vertical flip bits
-
     * a reference to an artwork tile and collision block by Block ID
+    * collision solidity control bits, for the primary and alternate layers
 
-    * collision solidity control bits, for the primary and alternate
-    layers
     '''
 
 class CollisionTile(object):

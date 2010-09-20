@@ -15,7 +15,9 @@ def reverse(byte):
     return result
 
 class Kosinski(object):
-    '''Kosinski decompressor'''
+    '''Kosinski decompressor object.
+
+    Use the convenience functions in this module for actually using it.'''
 
     def decompress(self, compressed):
         '''Decompress Kosinski compressed data.

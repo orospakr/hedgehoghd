@@ -18,3 +18,15 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
+Importer
+========
+
+Utility Modules
+---------------
+
+Kosinski Decompressor
+~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: hedgehoghd.importer.kosinski
+   :members:
+   :show-inheritance:

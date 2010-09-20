@@ -15,45 +15,14 @@ def reverse(byte):
     return result
 
 class Kosinski(object):
-    def __init__(self):
-#        self.compressed_offset = 0
-#        self.uncompressed = array.array('B')
-        pass
+    '''Kosinski decompressor'''
 
-    # '''Decompress compressed Kosinski data.
-
-    # data is an array of compressed data (from the array module) of bytes ('B' format string).
-
-    # If no EOS marker is present, the number of Kosinski blocks expected
-    # can be specified, or -1 for the usual behaviour.'''
-    # def decompress(self, data, count = -1):
-    #     self.compressed = data
-    #     self.compressed_offset = 0
-    #     if(count == -1):
-    #         should_continue = True
-    #         while(should_continue):
-    #             should_continue = self.decompressBlock()
-    #     else:
-    #         for i in range(0, count):
-    #             self.decompressBlock()
-
-    '''Decompress Kosinski compressed data.
-
-    data is an optional array (from the array module) of bytes ('B' format string).
-
-#    Returns True if there should be more blocks to process, or False if
-#    the stream has terminated.'''
     def decompress(self, compressed):
+        '''Decompress Kosinski compressed data.
 
+        `data` is an optional array (from the array module) of bytes ('B' format string).
+        '''
         self.uncompressed = array.array('B')
-#        if(compressed is None):
-#            compressed = self.compressed
-#            compressed_offset = self.compressed_offset
-
-        # descriptor block
-#        descriptor_high = reverse(compressed[compressed_offset + 0])
-#        descriptor_low = reverse(compressed[compressed_offset + 1])
-        # compressed[2] and after are all data block
 
         # offset to current descriptor block
         self.compressed_offset = 0
@@ -88,16 +57,6 @@ class Kosinski(object):
         # iterate forever over descriptor bits.  they are reloaded every time all 16 bits are consumed,
         # either if they are used up normally, or when an RLE descriptor is split between two
         while(True):
-            # if(self.position >= 16):
-            #     print "Cleanly beginning a new descriptor block!  Bytes used on last one: %d" % self.used_bytes
-            #     self.compressed_offset += self.used_bytes
-            #     read_new_descriptor()
-
-
-#            descriptor_position = 15 - self.position
-
-            # bytes that have been consumed from the compressed_data
-
             first_bit = read_descriptor_bit()
             if(first_bit):
                 logging.debug("uncompressed")
@@ -110,7 +69,6 @@ class Kosinski(object):
                 if(read_descriptor_bit()):
                     # separate RLE
                     logging.debug("... separate RLE")
-#                    self.position += 2 # uses two inline descriptor bits
                     first_offset_byte = compressed[self.compressed_offset]
                     second_offset_byte = compressed[self.compressed_offset + 1]
                     logging.debug("... first offset byte: %02x, second: %02x" % (first_offset_byte, second_offset_byte))
@@ -161,18 +119,10 @@ class Kosinski(object):
                 else:
                     # inline RLE
                     logging.debug("... inline RLE")
-#                     if(descriptor_position == 1):
-#                         # ugh, I don't know why they bothered with this.
-#                         print "oh man, the two length bits of the inline RLE descriptor are IN THE NEXT DESCRIPTOR BLOCK, argh"
-# #                        read_new_descriptor()
-# #                        self.position
-#                    flb_mask = read_descriptor_bit() # (2 ** (descriptor_position - 2))
-#                    print "FLB MASK: %f" % (flb_mask)
-                    first_length_bit = read_descriptor_bit() # (self.descriptor & flb_mask) / 2 ** (descriptor_position - 2)
-                    second_length_bit = read_descriptor_bit() # (self.descriptor & (2 ** (descriptor_position - 3))) / 2 ** (descriptor_position - 3)
+                    first_length_bit = read_descriptor_bit()
+                    second_length_bit = read_descriptor_bit()
                     logging.debug("first length bit: %d, second length bit: %d" % (first_length_bit, second_length_bit))
                     length_to_copy = (first_length_bit * 2) + (second_length_bit) + 2 # + 2 because format calls for it.
-                    #                length_to_copy = ((descriptor & (2 ** descriptor_position)) * 2) + (descriptor & (2 ** descriptor_position + 3)) + 2
                     offset_to_copy_from = (compressed[self.compressed_offset]) - 256
                     uncompressed_src_pos = offset_to_copy_from + len(self.uncompressed)
 
@@ -192,36 +142,30 @@ class Kosinski(object):
                         self.uncompressed.append(self.uncompressed[current_pos_to_copy])
                     # self.position += 4 # inline RLE bits
                     self.compressed_offset += 1 # the offset byte we read back
-
-        # if((len(compressed) % 16) != 0):
-        #     print "Not a valid Kosinski compressed file.  Length should be a multiple of 16."
-        #     exit(-1)
-
-
-        # continue
         return uncompressed
 
-'''Decompress Kosinski data in a file.
-
-Returns an array.array('B') of the decompressed data.'''
 def decompress_file(path):
+    '''Decompress Kosinski data in a file.
+    
+    Returns an array.array('B') of the decompressed data.'''
     c_fd = open(sys.argv[1], "rb")
     compressed = array.array('B', c_fd.read())
     c_fd.close()
     kos = Kosinski()
     return kos.decompress(compressed)
 
-'''Decompress Kosinski data in a string.
 
-Returns an array.array('B') of the decompressed data.'''
 def decompress_string(data):
+    '''Decompress Kosinski data in a string.
+
+    Returns an array.array('B') of the decompressed data.'''
     kos = Kosinski()
     return kos.decompress(array.array('B', data))
 
-'''Decompress Kosinski data in an array.array('B').
-
-Returns an array.array('B') of the decompressed data.'''
 def decompress_array(arr):
+    '''Decompress Kosinski data in an array.array('B').
+
+    Returns an array.array('B') of the decompressed data.'''
     kos = Kosinski()
     return kos.decompress(arr)
 

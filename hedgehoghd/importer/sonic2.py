@@ -104,7 +104,7 @@ class Zone(object):
         if(self.acts == 1):
             # only one act, disasm names them directly.
             fd = open(os.path.join(sonic2.s2_split_disassembly_dir, "level", "layout", "%s.bin" % self.code), "rb")
-            self.act_layouts[0] = LevelLayout(sonic2.chunk_arrays[self.chunk_array], fd.read())
+            self.act_layouts.append(LevelLayout(sonic2.chunk_arrays[self.chunk_array], fd.read()))
             fd.close()
         else:
             for act in range(0, self.acts):
@@ -118,6 +118,66 @@ class EmeraldHillZone(Zone):
     title = "Emerald Hill"
     code = "EHZ"
     chunk_array = "EHZ_HTZ"
+
+class ChemicalPlantZone(Zone):
+    acts = 2
+    title = "Chemical Plant"
+    code = "CPZ"
+    chunk_array = "CPZ_DEZ"
+
+class AquaticRuinZone(Zone):
+    acts = 2
+    title = "Aquatic Ruin"
+    code = "ARZ"
+    chunk_array = "ARZ"
+
+class CasinoNightZone(Zone):
+    acts = 2
+    title = "Casino Night"
+    code = "CNZ"
+    chunk_array = "CNZ"
+
+class HillTopZone(Zone):
+    acts = 2
+    title = "Hill Top"
+    code = "HTZ"
+    chunk_array = "EHZ_HTZ"
+
+class MysticCaveZone(Zone):
+    acts = 2
+    title = "Mystic Cave"
+    code = "MCZ"
+    chunk_array = "MCZ"
+
+class OilOceanZone(Zone):
+    acts = 2
+    title = "Oil Ocean"
+    code = "OOZ"
+    chunk_array = "OOZ"
+
+class MetropolisZone(Zone):
+    acts = 3
+    title = "Metropolis"
+    code = "MTZ"
+    chunk_array = "MTZ"
+
+class SkyChaseZone(Zone):
+    acts = 1
+    title = "Sky Chase"
+    code = "SCZ"
+    chunk_array = "WFZ_SCZ"
+
+class WingFortressZone(Zone):
+    acts = 1
+    title = "Wing Fortress"
+    code = "WFZ"
+    chunk_array = "WFZ_SCZ"
+
+class DeathEggZone(Zone):
+    acts = 1
+    title = "Death Egg"
+    code = "DEZ"
+    chunk_array = "CPZ_DEZ"
 
 class ChunkArray(object):
     '''Array of Chunks, used by either one or two Zones.
@@ -226,6 +286,16 @@ class Sonic2(object):
             self.loadChunkArray(cname)
         
         self.ehz = EmeraldHillZone(self)
+        self.cpz = ChemicalPlantZone(self)
+        self.arz = AquaticRuinZone(self)
+        self.cnz = CasinoNightZone(self)
+        self.htz = HillTopZone(self)
+        self.mcz = MysticCaveZone(self)
+        self.ooz = OilOceanZone(self)
+        self.mtz = MetropolisZone(self)
+        self.scz = SkyChaseZone(self)
+        self.wfz = WingFortressZone(self)
+        self.dez = DeathEggZone(self)
 
         # TODO instantiate each Zone, which will itself instantiate each act
         # they will look up chunks in the chunkarrays above.

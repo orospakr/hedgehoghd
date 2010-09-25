@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 
-
 import sys
 import optparse
+import logging
 
 import kosinski
 import sonic2
 import os.path
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO)
     parser = optparse.OptionParser(usage="%prog: <disassembly repo>")
     
     (options, args) = parser.parse_args()
@@ -17,5 +18,3 @@ if __name__ == '__main__':
     
     s2_path = os.path.join(args[0], "Sonic 2 Split Disassembly")
     sonic2 = sonic2.Sonic2(s2_path)
-
-

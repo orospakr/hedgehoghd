@@ -96,7 +96,7 @@ class Kosinski(object):
                         logging.debug("... third offset byte: %02x" % third_offset_byte)
                         if(third_offset_byte == 0):
                             # end of stream marker!
-                            logging.info("End of stream marker found! Goodbye.")
+                            logging.debug("End of stream marker found! Goodbye.")
                             return self.uncompressed
                         elif(third_offset_byte == 1):
                             logging.warn("Description block self-terminator found.  Not implemented!")

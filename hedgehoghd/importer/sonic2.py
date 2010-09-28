@@ -27,21 +27,14 @@ class CollisionArray(object):
     def __init__(self, data):
         '''Create a CollisionArray object from array data in a string.'''
         arr = array.array('B', data)
+        self.tiles = []
         if((len(arr) % 16) != 0):
             raise ValueError("Inappropriately sized data for a Sonic collision array: %d" % len(arr))
         number_of_tiles = len(arr) / 16
         for i in range(0, number_of_tiles):
-            row = arr[i*16:(i*16) + 16]
             logging.debug("Collision array block #%d" % i)
-
-            for column_byte in row:
-                bits = (0b11100000 & column_byte)
-                if(bits != 0xe0):
-                    # counted from bottom
-                    height = (0b00011111 & column_byte)
-                else:
-                    # counted from top.
-                    anti_height = (0b00011111 & column_byte) - 16
+            row = arr[i*16:(i*16) + 16]
+            self.tiles.append(CollisionTile(row))
 
 class CollisionIndex(object):
     '''Per-Zone Layer Collision Index
@@ -58,6 +51,9 @@ class CollisionIndex(object):
     between several zones.
 
     '''
+    def __init__(self, sonic2, data):
+        self.sonic2 = sonic2
+        self.ids = array.array('B', data)
 
 class LevelLayout(object):
     '''A Level's 128x16x2 Layout Map
@@ -109,7 +105,7 @@ class Zone(object):
         else:
             for act in range(0, self.acts):
                 logging.info("... Act %d" % (act + 1))
-                fd = open(os.path.join(sonic2.s2_split_disassembly_dir, "level", "layout", "%s_%d.bin" % (self.code, act + 1)), "rb") # acts are named from 1
+                fd = open(os.path.join(sonic2.s2_split_disassembly_dir, "level", "layout", "%s_%d.bin" % (self.code, act + 1)), "rb") # acts are numbered from 1
                 self.act_layouts.append(LevelLayout(sonic2.chunk_arrays[self.chunk_array], fd.read()))
                 fd.close()
 
@@ -181,8 +177,15 @@ class DeathEggZone(Zone):
 
 class ChunkArray(object):
     '''Array of Chunks, used by either one or two Zones.
+
+    Owns equivalent collision indexes.
     '''
-    def __init__(self, data):
+    def __init__(self, sonic2, name, data, primary_collision_index, secondary_collision_index):
+        self.name = name
+        self.sonic2 = sonic2
+        self.primary_collision_index = primary_collision_index
+        self.secondary_collision_index = secondary_collision_index
+
         bm = kosinski.decompress_string(data).tostring()
 
         if((len(bm) % 128) != 0):
@@ -199,7 +202,7 @@ class ChunkArray(object):
             logging.debug("... chunk %d: " % chunk_no)
             chunk_no += 1
             block_data = bm[block*128:(block*128) + 128]
-            self.chunks.append(Chunk(block_data))
+            self.chunks.append(Chunk(self, block_data))
 
 class Tile(object):
     '''16x16 Tile
@@ -212,19 +215,27 @@ class Tile(object):
     * a reference to an artwork tile and collision block by Block ID
     * collision solidity control bits, for the primary and alternate layers    
     '''
-    def __init__(self, tile_word):
-        self.alternate_collision = (tile_word & 0xC000) >> 14
-        self.normal_collision = (tile_word & 0x3000) >> 12
+    def __init__(self, chunk, tile_word):
+        self.chunk = chunk
+        self.alternate_collision_idx = (tile_word & 0xC000) >> 14
+        self.normal_collision_idx = (tile_word & 0x3000) >> 12
         self.tile_index = tile_word & 0x3FF
         self.y_flipped = (tile_word & 800)
         self.x_flipped = (tile_word & 400)
 
-        if(self.alternate_collision > 3):
+        if(self.alternate_collision_idx > 3):
             logging.error("Impossible alternate collision value in chunk?!: %d" % self.aternate_collision)
             exit(-1)
-        if(self.normal_collision > 3):
+        if(self.normal_collision_idx > 3):
             logging.error("Impossible normal collision value in chunk?!: %d" % self.normal_collision)
-            exit(-1)    
+            exit(-1)
+
+        # reaching back through all the references is really kinda icky,
+        # should really make better encapsulation.
+#        if(self.alternate_collision_idx != 0):
+#            self.alternate_collision = self.chunk.chunk_array.secondary_collision_index.ids[self.alternate_collision_idx]
+
+        self.primary_collision = self.chunk.chunk_array.sonic2.coll1.tiles[self.chunk.chunk_array.primary_collision_index.ids[self.normal_collision_idx]]
         
         # TODO. do lookup in collision index for associated act and
         # get collisiontile.
@@ -237,7 +248,8 @@ class Chunk(object):
     They are arranged as a matrix of 16x16 pixel blocks, represented
     by the Tile class.
     '''
-    def __init__(self, block_data):
+    def __init__(self, chunk_array, block_data):
+        self.chunk_array = chunk_array
         values = struct.unpack('64H', block_data)
         if(len(values) != 64):
             logging.error("Chunk somehow longer than 64?!")
@@ -250,7 +262,7 @@ class Chunk(object):
 
             # SSTT YXII IIII IIII
             for column in current_row:
-                self.tiles.append(Tile(column))
+                self.tiles.append(Tile(self, column))
             
 class CollisionTile(object):
     '''16x16 Collision Shape Tile
@@ -259,8 +271,17 @@ class CollisionTile(object):
     cannot contain an arbitrary 16x16 bitmap), with bits that determine
     whether the solid piece is above or below the specified height.
     '''
-    def __init__(self, data):
-        pass
+    def __init__(self, data_arr):
+
+
+        for column_byte in data_arr:
+            bits = (0b11100000 & column_byte)
+            if(bits != 0xe0):
+                # counted from bottom
+                height = (0b00011111 & column_byte)
+            else:
+                # counted from top.
+                anti_height = (0b00011111 & column_byte) - 16
 
 class Sonic2(object):
     def __init__(self, s2_split_disassembly_dir):
@@ -302,5 +323,28 @@ class Sonic2(object):
 
     def loadChunkArray(self, name):
         logging.info("Loading 128x128 chunk array for: %s" % name)
+        collision_index_name = name
+        if(name == "CPZ_DEZ"):
+            collision_index_name = "CPZ and DEZ"
+        elif(name == "EHZ_HTZ"):
+            collision_index_name = "EHZ and HTZ"
+        elif(name == "WFZ_SCZ"):
+            collision_index_name = "WFZ and SCZ"
+        
+
+        index_fn_pattern = os.path.join(self.s2_split_disassembly_dir, "collision", "%s %s 16x16 collision index.bin" % (collision_index_name, "%s"))
+        
+        c_p_idx_fd = open(index_fn_pattern % "primary", "rb")
+        primary_index = CollisionIndex(self, c_p_idx_fd.read())
+        c_p_idx_fd.close()
+        
+        secondary_index = None
+        # MCZ, OOZ, MTZ, and WFZ_SCZ don't have secondary indexes...
+        if(not (name == "MCZ" or name == "OOZ" or name == "MTZ" or name == "WFZ_SCZ")):
+            c_s_idx_fd = open(index_fn_pattern % "secondary", "rb")
+            secondary_index = CollisionIndex(self, c_s_idx_fd.read())
+            c_s_idx_fd.close()
+                                        
         chunk_fd = open(os.path.join(self.s2_split_disassembly_dir, "mappings", "128x128", "%s.bin" % name), "rb")
-        self.chunk_arrays[name] = ChunkArray(chunk_fd.read())
+        self.chunk_arrays[name] = ChunkArray(self, name, chunk_fd.read(), primary_index, secondary_index)
+        chunk_fd.close()

@@ -6,11 +6,20 @@ class CollisionTile(object):
     whether the solid piece is above or below the specified height.
     '''
     def __init__(self, data_arr):
+        self.columns = []
         for column_byte in data_arr:
             bits = (0b11100000 & column_byte)
+            fill = None # 0 for from-bottom, 1 for from-top
+            height = 0
             if(bits != 0xe0):
                 # counted from bottom
+                fill = 0
                 height = (0b00011111 & column_byte)
             else:
                 # counted from top.
-                anti_height = (0b00011111 & column_byte) - 16
+                fill = 1
+                height = (0b00011111 & column_byte)
+
+            self.columns.append((fill, height))
+
+

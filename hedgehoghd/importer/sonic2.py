@@ -114,6 +114,8 @@ class Sonic2(object):
         self.wfz = WingFortressZone(self)
         self.dez = DeathEggZone(self)
 
+        self.ehz.toSVG("/tmp/ehz.svg")
+
         # TODO instantiate each Zone, which will itself instantiate each act
         # they will look up chunks in the chunkarrays above.
 

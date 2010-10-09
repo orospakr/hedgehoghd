@@ -30,3 +30,10 @@ class CollisionArray(object):
             logging.debug("Collision array block #%d" % i)
             row = arr[i*16:(i*16) + 16]
             self.tiles.append(collision_tile.CollisionTile(row))
+
+    def toSVG(self, xml):
+        tilecount = 0
+        for tile in self.tiles:
+            with xml.g(id="tile_%d" % tilecount, transform="translate(%d, 0)" % (tilecount * 16)):
+                tile.toSVG(xml)
+            tilecount += 1

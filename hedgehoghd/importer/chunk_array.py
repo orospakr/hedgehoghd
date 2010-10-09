@@ -31,3 +31,12 @@ class ChunkArray(object):
             chunk_no += 1
             block_data = bm[block*128:(block*128) + 128]
             self.chunks.append(chunk.Chunk(self, block_data))
+
+    def toSVG(self, xml):
+        chunkpos = 0
+        for chunk in self.chunks:
+            with xml.g(id="chunk_%d" % chunkpos, transform="translate(%d, 0)" % (chunkpos * 128)):
+                chunk.toSVG(xml)
+            chunkpos += 1
+
+

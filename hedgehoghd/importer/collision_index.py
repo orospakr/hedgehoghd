@@ -1,4 +1,4 @@
-import array
+import kosinski
 
 class CollisionIndex(object):
     '''Per-Zone Layer Collision Index
@@ -17,4 +17,4 @@ class CollisionIndex(object):
     '''
     def __init__(self, sonic2, data):
         self.sonic2 = sonic2
-        self.ids = array.array('B', data)
+        self.ids = kosinski.decompress_string(data)

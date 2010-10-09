@@ -37,3 +37,16 @@ class LevelLayout(object):
                 self.foreground.append(row)
             else:
                 self.background.append(row)
+
+    def toSVG(self, xml):
+        rowpos = 0
+        for row in self.foreground:
+            chunkpos = 0
+            for chunk in row:
+                with xml.g(transform="translate(%d, %d)" % (chunkpos * 128, rowpos * 128)):
+                    chunk.toSVG(xml)
+                # with xml.rect(transform="translate(%d, %d)" % (chunkpos * 128, rowpos * 128),
+                #               width="128", height="128", x="0", y="0", id="chunk_%d_%d" % (chunkpos, rowpos)):
+                #     pass
+                chunkpos += 1
+            rowpos += 1

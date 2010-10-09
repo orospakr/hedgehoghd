@@ -79,7 +79,7 @@ for i in range(0, fs / 16):
             
 
     svg.write('" id="path2816"\n\
-       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />\n\
+       style="fill:none;stroke:#0000ff;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />\n\
   </g>\n\
 </svg>')
     svg.close()

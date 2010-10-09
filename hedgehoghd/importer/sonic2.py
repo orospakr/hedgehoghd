@@ -13,6 +13,8 @@ import level_layout
 import zone
 import chunk_array
 
+from xmlwitch import builder
+
 class EmeraldHillZone(zone.Zone):
     acts = 2
     title = "Emerald Hill"
@@ -114,7 +116,36 @@ class Sonic2(object):
         self.wfz = WingFortressZone(self)
         self.dez = DeathEggZone(self)
 
-        self.ehz.toSVG("/tmp/ehz.svg")
+        # self.ehz.toSVG("/tmp/ehz.svg")
+        collxml = builder(version="1.0", encoding="utf-8")
+
+        with collxml.svg(**{'xmlns:dc':"http://purl.org/dc/elements/1.1/",
+                        'xmlns:rdf':"http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+                        'xmlns:svg':"http://www.w3.org/2000/svg",
+                        'xmlns':"http://www.w3.org/2000/svg",
+                        'version':"1.1",
+                        'width':"%d" % (16*len(self.coll1.tiles)), 'height':"%d" % (32)}):
+            with collxml.g(id="collision1"):
+                self.coll1.toSVG(collxml)
+            with collxml.g(id="collision2", transform="translate(0, 16)"):
+                self.coll2.toSVG(collxml)
+
+        coll_svg_fd = open("/tmp/collision.svg", "wb")
+        coll_svg_fd.write(str(collxml))
+        coll_svg_fd.close()
+
+        ehz_chunk_xml = builder(version="1.0", encoding="utf-8")
+        with ehz_chunk_xml.svg(**{'xmlns:dc':"http://purl.org/dc/elements/1.1/",
+                        'xmlns:rdf':"http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+                        'xmlns:svg':"http://www.w3.org/2000/svg",
+                        'xmlns':"http://www.w3.org/2000/svg",
+                        'version':"1.1",
+                        'width':"%d" % (128*len(self.chunk_arrays["EHZ_HTZ"].chunks)), 'height':"%d" % (128)}):
+            self.chunk_arrays["EHZ_HTZ"].toSVG(ehz_chunk_xml)
+        
+        ehz_chunk_xml_fd = open("/tmp/ehz_chunks.svg", "wb")
+        ehz_chunk_xml_fd.write(str(ehz_chunk_xml))
+        ehz_chunk_xml_fd.close()
 
         # TODO instantiate each Zone, which will itself instantiate each act
         # they will look up chunks in the chunkarrays above.

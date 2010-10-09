@@ -17,12 +17,27 @@ class Chunk(object):
         if(len(values) != 64):
             logging.error("Chunk somehow longer than 64?!")
             exit(-1)
-        self.tiles = []
+
+        # Tiles
+        self.rows = []
 
         for r in range(0, 8):
             row_offset = r * 8
             current_row = values[row_offset:row_offset+8]
 
             # SSTT YXII IIII IIII
+            row = []
             for column in current_row:
-                self.tiles.append(tile.Tile(self, column))
+                row.append(tile.Tile(self, column))
+            self.rows.append(row)
+
+    def toSVG(self, xml):
+        rowpos = 0
+        for row in self.rows:
+            columnpos = 0
+            for column in row:
+                with xml.g(transform="translate(%d, %d)" % (rowpos*16, columnpos*16)):
+                    column.toSVG(xml)
+                columnpos += 1
+            rowpos += 1
+            

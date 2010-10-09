@@ -23,3 +23,21 @@ class CollisionTile(object):
             self.columns.append((fill, height))
 
 
+    def toSVG(self, xml):
+        path_string = "M 0,0 "
+        column_pos = 0
+        
+        for column in self.columns:
+            fill, height = column
+            if(fill == 1):
+                # from top
+                path_string += "L %d,%d " % (column_pos, height - 16)
+            else:
+                # from bottom
+                path_string += "L %d,%d " % (column_pos, height)
+                column_pos += 1
+
+        with xml.path(d=path_string,
+                      style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"):
+            pass
+        

@@ -18,3 +18,6 @@ class CollisionIndex(object):
     def __init__(self, sonic2, data):
         self.sonic2 = sonic2
         self.ids = kosinski.decompress_string(data)
+        if(len(self.ids) != 768):
+            logging.error("Sonic 2 collision indexes are always 768 records (bytes) long.")
+            exit(-1)

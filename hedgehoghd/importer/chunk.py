@@ -13,7 +13,7 @@ class Chunk(object):
     '''
     def __init__(self, chunk_array, block_data):
         self.chunk_array = chunk_array
-        values = struct.unpack('64H', block_data)
+        values = struct.unpack('>64H', block_data)
         if(len(values) != 64):
             logging.error("Chunk somehow longer than 64?!")
             exit(-1)

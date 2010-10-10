@@ -25,7 +25,6 @@ class Chunk(object):
             row_offset = r * 8
             current_row = values[row_offset:row_offset+8]
 
-            # SSTT YXII IIII IIII
             row = []
             for column in current_row:
                 row.append(tile.Tile(self, column))
@@ -36,7 +35,7 @@ class Chunk(object):
         for row in self.rows:
             columnpos = 0
             for column in row:
-                with xml.g(transform="translate(%d, %d)" % (rowpos*16, columnpos*16)):
+                with xml.g(transform="translate(%d, %d)" % (columnpos*16, rowpos*16)):
                     column.toSVG(xml)
                 columnpos += 1
             rowpos += 1

@@ -4,6 +4,8 @@ class CollisionTile(object):
     They effectively draw a bitmapped line with a value per column (they
     cannot contain an arbitrary 16x16 bitmap), with bits that determine
     whether the solid piece is above or below the specified height.
+
+    http://forums.sonicretro.org/index.php?showtopic=3095
     '''
     def __init__(self, data_arr):
         self.columns = []
@@ -26,18 +28,21 @@ class CollisionTile(object):
     def toSVG(self, xml):
         path_string = "M 0,0 "
         column_pos = 0
-        
+        first = True
+
+        # TODO: there can be breaks in the path, which are not handled here.  really need to start a new path element.
         for column in self.columns:
             fill, height = column
-            if(fill == 1):
-                # from top
-                path_string += "L %d,%d " % (column_pos, height - 16)
+            if(height == 0):
+                continue
+            if(first):
+                path_string += "M %d,%d " % (column_pos, 16 - height)
+                first = False
             else:
-                # from bottom
-                path_string += "L %d,%d " % (column_pos, height)
-                column_pos += 1
+                path_string += "L %d,%d " % (column_pos, 16 - height)
+            column_pos += 1
 
         with xml.path(d=path_string,
-                      style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"):
+                      style="fill:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"):
             pass
         

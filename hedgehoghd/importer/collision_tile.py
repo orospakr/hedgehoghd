@@ -14,39 +14,48 @@ class CollisionTile(object):
             fill = None # 0 for from-bottom, 1 for from-top
             height = 0
             if(bits != 0xe0):
-                # counted from bottom
+                # fill from bottom
                 fill = 0
-                height = (0b00011111 & column_byte)
+                h_val = (0b00011111 & column_byte)
+                if(h_val != 0):
+                    height = h_val - 1
+                else:
+                    height = None
             else:
-                # counted from top.
+                # fill from top.
                 fill = 1
                 height = (0b00011111 & column_byte)
 
             self.columns.append((fill, height))
 
-
     def toSVG(self, xml):
         column_pos = 0
         first = True
-        path_string = ""
+        self.path_string = ""
 
         with xml.rect(x="0", y="0", width="16", height="16", style="fill:none;stroke:#7f7f7f"):
             pass
 
+        def prepend(data):
+            self.path_string = "%s%s" % (data, self.path_string)
+
+        def append(data):
+            self.path_string = "%s%s" % (self.path_string, data)
+
         # TODO: there can be breaks in the path, which are not handled here.  really need to start a new path element.
         for column in self.columns:
             fill, height = column
-            if(height == 0):
+            if(height == None):
                 column_pos += 1
                 continue
             if(first):
-                path_string += "M %d,%d " % (column_pos, 16 - height)
+                self.path_string += "M %d,%d " % (column_pos, 15 - height)
                 first = False
             else:
-                path_string += "L %d,%d " % (column_pos, 16 - height)
+                self.path_string += "L %d,%d " % (column_pos, 15 - height)
             column_pos += 1
 
-        with xml.path(d=path_string,
+        with xml.path(d=self.path_string,
                       style="fill:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"):
             pass
         

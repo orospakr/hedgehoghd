@@ -124,10 +124,10 @@ class Sonic2(object):
                         'xmlns:svg':"http://www.w3.org/2000/svg",
                         'xmlns':"http://www.w3.org/2000/svg",
                         'version':"1.1",
-                        'width':"%d" % (16*len(self.coll1.tiles)), 'height':"%d" % (32)}):
+                        'width':"%d" % ((16*len(self.coll1.tiles)) + (4*(len(self.coll1.tiles)))), 'height':"%d" % (32 + 4)}):
             with collxml.g(id="collision1"):
                 self.coll1.toSVG(collxml)
-            with collxml.g(id="collision2", transform="translate(0, 16)"):
+            with collxml.g(id="collision2", transform="translate(0, 20)"):
                 self.coll2.toSVG(collxml)
 
         coll_svg_fd = open("/tmp/collision.svg", "wb")

@@ -27,14 +27,15 @@ class CollisionArray(object):
             raise ValueError("Inappropriately sized data for a Sonic collision array: %d" % len(arr))
         number_of_tiles = len(arr) / 16
         for i in range(0, number_of_tiles):
-            logging.debug("Collision array block #%d" % i)
+            logging.debug("Collision array block #%x" % i)
             row = arr[i*16:(i*16) + 16]
+            # logging.debug(repr(row))
             self.tiles.append(collision_tile.CollisionTile(row))
 
     def toSVG(self, xml):
         tilecount = 0
         for tile in self.tiles:
-            with xml.g(id="tile_%x" % tilecount, transform="translate(%d, 0)" % (tilecount * 16),
+            with xml.g(id="tile_%x" % tilecount, transform="translate(%d, 0)" % ((tilecount * 16) + (tilecount * 4)),
                        style="stroke:#000000"):
                 tile.toSVG(xml)
             tilecount += 1

@@ -1,0 +1,264 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Importer &mdash; HedgehogHD v0.0.1 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.0.1',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="HedgehogHD v0.0.1 documentation" href="index.html" />
+    <link rel="prev" title="HedgehogHD" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="HedgehogHD"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">HedgehogHD v0.0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-hedgehoghd.importer">
+<h1>Importer<a class="headerlink" href="#module-hedgehoghd.importer" title="Permalink to this headline">¶</a></h1>
+<p>Python code responsible for loading, interpreting, and migrating
+the artwork, level map, geometry, and object data from the classic
+Sega Sonic the Hedgehog Mega-Drive engine to HedgehogHD&#8217;s data model.</p>
+<div class="section" id="module-hedgehoghd.importer.tile">
+<h2>Sonic 2<a class="headerlink" href="#module-hedgehoghd.importer.tile" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="hedgehoghd.importer.zone.Zone">
+<em class="property">class </em><tt class="descclassname">hedgehoghd.importer.zone.</tt><tt class="descname">Zone</tt><big>(</big><em>sonic2</em><big>)</big><a class="headerlink" href="#hedgehoghd.importer.zone.Zone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref docutils literal"><span class="pre">object</span></tt></p>
+<p>A Zone!</p>
+<p>Contains several Acts.</p>
+<p>This class is inherited from in order to create a definition of a
+specific Zone.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="hedgehoghd.importer.chunk_array.ChunkArray">
+<em class="property">class </em><tt class="descclassname">hedgehoghd.importer.chunk_array.</tt><tt class="descname">ChunkArray</tt><big>(</big><em>sonic2</em>, <em>name</em>, <em>data</em>, <em>primary_collision_index</em>, <em>secondary_collision_index</em><big>)</big><a class="headerlink" href="#hedgehoghd.importer.chunk_array.ChunkArray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref docutils literal"><span class="pre">object</span></tt></p>
+<p>Array of Chunks, typically used by either one or two Zones</p>
+<p>As found in mappings/128x128, Kosinski compressed.</p>
+<p>Each Chunk consists of 128 bytes, and this file consists of
+typically 256 of them appended together.</p>
+<p>The CollisionIndexes are grouped together in the same way, and
+the Chunks this ChunkArray instantiates will need to look up their
+CollisionTiles through those.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="hedgehoghd.importer.collision_array.CollisionArray">
+<em class="property">class </em><tt class="descclassname">hedgehoghd.importer.collision_array.</tt><tt class="descname">CollisionArray</tt><big>(</big><em>data</em><big>)</big><a class="headerlink" href="#hedgehoghd.importer.collision_array.CollisionArray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref docutils literal"><span class="pre">object</span></tt></p>
+<p>Collision Geometry Array</p>
+<p>As found in <tt class="docutils literal"><span class="pre">collision/Collision</span> <span class="pre">array</span> <span class="pre">N.bin</span></tt>.  These arrays
+provide the 16x16 collision geometry used in all levels.</p>
+<p>The first array (&#8216;1&#8217;) is used in the CollisionTiles and mapped
+into the Chunks.</p>
+<p>I am still unclear as to the role of the second array.  It appears
+to be rotated 90 CCW, and flipped horizontally.  I&#8217;m unsure of its
+purpose, as it is not used in the layout.  Perhaps it is used by
+YU2&#8217;s physics, maybe proving less expensive than the unrotated
+version for certain operations?</p>
+<p>Contains many instances of CollisionTile.</p>
+<p>These are referenced through the per-zone collision layer
+CollisionIndex instances for each Chunk.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="hedgehoghd.importer.level_layout.LevelLayout">
+<em class="property">class </em><tt class="descclassname">hedgehoghd.importer.level_layout.</tt><tt class="descname">LevelLayout</tt><big>(</big><em>chunk_array</em>, <em>data</em><big>)</big><a class="headerlink" href="#hedgehoghd.importer.level_layout.LevelLayout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref docutils literal"><span class="pre">object</span></tt></p>
+<p>A Level&#8217;s 128x16x2 Layout Map</p>
+<p>As found in level/layout/, Kosinski compressed.  There is one for
+each Zone Act.</p>
+<p>There are 128 columns, 16 rows, and 2 layers, foreground and
+background.  They are arranged as a sequence of rows, with
+foreground and background interleaved.  Each 1-byte cell addresses
+a 128x128 block out of the 256 available from the ChunkArray
+assigned to this Zone.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="hedgehoghd.importer.collision_tile.CollisionTile">
+<em class="property">class </em><tt class="descclassname">hedgehoghd.importer.collision_tile.</tt><tt class="descname">CollisionTile</tt><big>(</big><em>data_arr</em><big>)</big><a class="headerlink" href="#hedgehoghd.importer.collision_tile.CollisionTile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref docutils literal"><span class="pre">object</span></tt></p>
+<p>16x16 Collision Shape Tile</p>
+<p>They effectively draw a filled in bitmapped shape with a value per
+column (they cannot contain an arbitrary 16x16 bitmap), with bits
+that determine whether the column is filled in above or below the
+specified height.</p>
+<p>The first 3 bits of this byte are on when filling in from the top,
+or off when filling in from the bottom.  The remaining bits are
+the height position (counted from the bottom).  However, in order
+to have an empty position, the height value when filling from the
+bottom counts from 1 rather than 0, so that 0 might be used as the
+column empty value.</p>
+<p><a class="reference external" href="http://forums.sonicretro.org/index.php?showtopic=3095">http://forums.sonicretro.org/index.php?showtopic=3095</a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="hedgehoghd.importer.chunk.Chunk">
+<em class="property">class </em><tt class="descclassname">hedgehoghd.importer.chunk.</tt><tt class="descname">Chunk</tt><big>(</big><em>chunk_array</em>, <em>block_data</em>, <em>position</em><big>)</big><a class="headerlink" href="#hedgehoghd.importer.chunk.Chunk" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref docutils literal"><span class="pre">object</span></tt></p>
+<p>128x128 Chunks as mapped into LevelLayouts&#8217; backgrounds and foregrounds</p>
+<p>As found in <tt class="docutils literal"><span class="pre">mappings/128x128/</span></tt>, together in the ChunkArrays, Kosinski compressed.</p>
+<p>They contain a 16x16 array of Tiles.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="hedgehoghd.importer.tile.Tile">
+<em class="property">class </em><tt class="descclassname">hedgehoghd.importer.tile.</tt><tt class="descname">Tile</tt><big>(</big><em>chunk</em>, <em>tile_word</em><big>)</big><a class="headerlink" href="#hedgehoghd.importer.tile.Tile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref docutils literal"><span class="pre">object</span></tt></p>
+<p>16x16 Tile instance in a Chunk</p>
+<p>Contains the parameters describing the Collision, graphics Block,
+and flip properties of a given 16x16 tile in a Chuink.  These are
+not shared by any other Chunks.</p>
+<p>64 of which exist in a Chunk, arranged in 8x8.</p>
+<p>They contain:</p>
+<ul class="simple">
+<li>horizontal and vertical flip bits</li>
+<li>a reference to an artwork tile and collision block (through the</li>
+</ul>
+<p>index) by Tile ID collision solidity control bits, for the primary
+and alternate layers</p>
+<p># SSTT YXII IIII IIII</p>
+</dd></dl>
+
+</div>
+<div class="section" id="utility-modules">
+<h2>Utility Modules<a class="headerlink" href="#utility-modules" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-hedgehoghd.importer.kosinski">
+<h3>Kosinski Decompressor<a class="headerlink" href="#module-hedgehoghd.importer.kosinski" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="hedgehoghd.importer.kosinski.Kosinski">
+<em class="property">class </em><tt class="descclassname">hedgehoghd.importer.kosinski.</tt><tt class="descname">Kosinski</tt><a class="headerlink" href="#hedgehoghd.importer.kosinski.Kosinski" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref docutils literal"><span class="pre">object</span></tt></p>
+<p>Kosinski decompressor object.</p>
+<p>Use the convenience functions in this module for actually using it.</p>
+<dl class="method">
+<dt id="hedgehoghd.importer.kosinski.Kosinski.decompress">
+<tt class="descname">decompress</tt><big>(</big><em>compressed</em><big>)</big><a class="headerlink" href="#hedgehoghd.importer.kosinski.Kosinski.decompress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decompress Kosinski compressed data.</p>
+<p><cite>data</cite> is an optional array (from the array module) of bytes (&#8216;B&#8217; format string).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="hedgehoghd.importer.kosinski.decompress_array">
+<tt class="descclassname">hedgehoghd.importer.kosinski.</tt><tt class="descname">decompress_array</tt><big>(</big><em>arr</em><big>)</big><a class="headerlink" href="#hedgehoghd.importer.kosinski.decompress_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decompress Kosinski data in an array.array(&#8216;B&#8217;).</p>
+<p>Returns an array.array(&#8216;B&#8217;) of the decompressed data.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="hedgehoghd.importer.kosinski.decompress_file">
+<tt class="descclassname">hedgehoghd.importer.kosinski.</tt><tt class="descname">decompress_file</tt><big>(</big><em>path</em><big>)</big><a class="headerlink" href="#hedgehoghd.importer.kosinski.decompress_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decompress Kosinski data in a file.</p>
+<p>Returns an array.array(&#8216;B&#8217;) of the decompressed data.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="hedgehoghd.importer.kosinski.decompress_string">
+<tt class="descclassname">hedgehoghd.importer.kosinski.</tt><tt class="descname">decompress_string</tt><big>(</big><em>data</em><big>)</big><a class="headerlink" href="#hedgehoghd.importer.kosinski.decompress_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decompress Kosinski data in a string.</p>
+<p>Returns an array.array(&#8216;B&#8217;) of the decompressed data.</p>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="#">Importer</a><ul>
+<li><a class="reference external" href="#module-hedgehoghd.importer.tile">Sonic 2</a></li>
+<li><a class="reference external" href="#utility-modules">Utility Modules</a><ul>
+<li><a class="reference external" href="#module-hedgehoghd.importer.kosinski">Kosinski Decompressor</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="index.html"
+                                  title="previous chapter">HedgehogHD</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/importer.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="HedgehogHD"
+             >previous</a> |</li>
+        <li><a href="index.html">HedgehogHD v0.0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2010, Andrew Clunis.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.6.
+    </div>
+  </body>
+</html>

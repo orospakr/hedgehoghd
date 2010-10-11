@@ -4,9 +4,16 @@ import chunk
 import kosinski
 
 class ChunkArray(object):
-    '''Array of Chunks, used by either one or two Zones.
+    '''Array of Chunks, typically used by either one or two Zones.
 
-    Owns equivalent collision indexes.
+    As found in mappings/128x128, Kosinski compressed.
+
+    Each Chunk consists of 128 bytes, and this file consists of
+    typically 256 of them appended together.
+
+    The CollisionIndexes are grouped together in the same way, and
+    the Chunks this ChunkArray instantiates will need to look up their
+    CollisionTiles through those.
     '''
     def __init__(self, sonic2, name, data, primary_collision_index, secondary_collision_index):
         self.name = name

@@ -6,12 +6,17 @@ import collision_tile
 class CollisionArray(object):
     '''Collision Geometry Array
 
-    As found in ``collision/Collision array N.bin``.  These arrays provide
-    the 16x16 collision geometry used in all levels.  I am still unclear
-    as to the role of the second array.  Comments in the annotated
-    disassembly suggest that it is rotated.  It does *not* appear to have
-    to do with the distinction between "primary" and "secondary" collision
-    layers.
+    As found in ``collision/Collision array N.bin``.  These arrays
+    provide the 16x16 collision geometry used in all levels.
+
+    The first array ('1') is used in the CollisionTiles and mapped
+    into the Chunks.
+
+    I am still unclear as to the role of the second array.  It appears
+    to be rotated 90 CCW, and flipped horizontally.  I'm unsure of its
+    purpose, as it is not used in the layout.  Perhaps it is used by
+    YU2's physics, maybe proving less expensive than the unrotated
+    version for certain operations?
 
     Contains many instances of CollisionTile.
 

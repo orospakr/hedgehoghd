@@ -6,12 +6,14 @@ import kosinski
 class LevelLayout(object):
     '''A Level's 128x16x2 Layout Map
 
-    As found in level/layout/, Kosinski compressed.
+    As found in level/layout/, Kosinski compressed.  There is one for
+    each Zone Act.
 
-    It has a foreground and background layer.  They are interlaced at the
-    row level.
-
-    There is one for each Zone Act.
+    There are 128 columns, 16 rows, and 2 layers, foreground and
+    background.  They are arranged as a sequence of rows, with
+    foreground and background interleaved.  Each 1-byte cell addresses
+    a 128x128 block out of the 256 available from the ChunkArray
+    assigned to this Zone.
     '''
     def __init__(self, chunk_array, data):
         self.chunk_array = chunk_array

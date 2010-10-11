@@ -6,10 +6,9 @@ import tile
 class Chunk(object):
     '''128x128 Chunks as mapped into LevelLayouts' backgrounds and foregrounds
 
-    As found in ``mappings/128x128/``, Kosinski compressed.
+    As found in ``mappings/128x128/``, together in the ChunkArrays, Kosinski compressed.
 
-    They are arranged as a matrix of 16x16 pixel blocks, represented
-    by the Tile class.
+    They contain a 16x16 array of Tiles.
     '''
     def __init__(self, chunk_array, block_data, position):
         self.chunk_array = chunk_array
@@ -42,4 +41,3 @@ class Chunk(object):
                     column.toSVG(xml)
                 columnpos += 1
             rowpos += 1
-            

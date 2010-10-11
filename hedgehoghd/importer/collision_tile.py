@@ -3,9 +3,17 @@ import logging
 class CollisionTile(object):
     '''16x16 Collision Shape Tile
 
-    They effectively draw a bitmapped line with a value per column (they
-    cannot contain an arbitrary 16x16 bitmap), with bits that determine
-    whether the solid piece is above or below the specified height.
+    They effectively draw a filled in bitmapped shape with a value per
+    column (they cannot contain an arbitrary 16x16 bitmap), with bits
+    that determine whether the column is filled in above or below the
+    specified height.
+
+    The first 3 bits of this byte are on when filling in from the top,
+    or off when filling in from the bottom.  The remaining bits are
+    the height position (counted from the bottom).  However, in order
+    to have an empty position, the height value when filling from the
+    bottom counts from 1 rather than 0, so that 0 might be used as the
+    column empty value.
 
     http://forums.sonicretro.org/index.php?showtopic=3095
     '''

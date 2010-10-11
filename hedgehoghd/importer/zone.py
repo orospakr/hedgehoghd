@@ -9,6 +9,11 @@ from xmlwitch import builder
 
 class Zone(object):
     '''A Zone!
+
+    Contains several Acts.
+
+    This class is inherited from in order to create a definition of a
+    specific Zone.
     '''
     def __init__(self, sonic2):
         # load LevelMaps from level/layout for each act

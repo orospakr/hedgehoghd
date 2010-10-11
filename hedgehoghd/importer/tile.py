@@ -1,17 +1,20 @@
 import logging
 
 class Tile(object):
-    '''16x16 Tile
+    '''16x16 Tile instance in a Chunk
 
-    "Block" in SonED2 parlance.
+    Contains the parameters describing the Collision, graphics Block,
+    and flip properties of a given 16x16 tile in a Chuink.  These are
+    not shared by any other Chunks.
 
     64 of which exist in a Chunk, arranged in 8x8.
 
     They contain:
 
     * horizontal and vertical flip bits
-    * a reference to an artwork tile and collision block (through the index) by Tile ID
-    * collision solidity control bits, for the primary and alternate layers
+    * a reference to an artwork tile and collision block (through the
+    index) by Tile ID collision solidity control bits, for the primary
+    and alternate layers
 
     # SSTT YXII IIII IIII
     '''

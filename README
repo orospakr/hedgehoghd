@@ -1,7 +1,17 @@
 HedgehogHD
 ==========
 
-An attempt to reimplment the famous YU2 Sonic platformer engine from the Sega Genesis.
+An attempt to reimplement the famous YU2 Sonic platformer engine from
+the Sega Genesis, with an emphasis on supporting pixel independent
+vector graphics.
+
+Copyright 2010 Andrew Clunis <andrew@orospakr.ca>
+Distributed under the terms of the GNU General Public License v3.
+
+Please see file COPYING for details.
+
+Please note that the xmlwitch module included in the importer is BSD
+licensed (please see file for details).
 
 Importer
 --------

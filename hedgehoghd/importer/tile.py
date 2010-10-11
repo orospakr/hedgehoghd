@@ -51,6 +51,8 @@ class Tile(object):
             elif(self.x_flipped):
                 colour = "0000ff"
             # transform="scale(%d, %d)" % (-1 if self.x_flipped else 1, -1 if self.y_flipped else 1),
-            with xml.g(transform="scale(%d, %d)" % (-1 if self.x_flipped else 1, -1 if self.y_flipped else 1),
+            with xml.g(transform="translate(%d, %d) scale(%d, %d)" % (16 if self.x_flipped else 0, 16 if self.y_flipped else 0, -1 if self.x_flipped else 1, -1 if self.y_flipped else 1),
                        style="stroke:#%s" % colour):
+                # with xml.rect(width="16", height="16", style="fill:none;stroke:#000000"):
+                #     pass
                 self.primary_collision.toSVG(xml)

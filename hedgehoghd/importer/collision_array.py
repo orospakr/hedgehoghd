@@ -34,6 +34,7 @@ class CollisionArray(object):
     def toSVG(self, xml):
         tilecount = 0
         for tile in self.tiles:
-            with xml.g(id="tile_%d" % tilecount, transform="translate(%d, 0)" % (tilecount * 16)):
+            with xml.g(id="tile_%x" % tilecount, transform="translate(%d, 0)" % (tilecount * 16),
+                       style="stroke:#000000"):
                 tile.toSVG(xml)
             tilecount += 1

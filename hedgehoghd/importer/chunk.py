@@ -11,8 +11,9 @@ class Chunk(object):
     They are arranged as a matrix of 16x16 pixel blocks, represented
     by the Tile class.
     '''
-    def __init__(self, chunk_array, block_data):
+    def __init__(self, chunk_array, block_data, position):
         self.chunk_array = chunk_array
+        self.position = position
         values = struct.unpack('>64H', block_data)
         if(len(values) != 64):
             logging.error("Chunk somehow longer than 64?!")
@@ -26,8 +27,10 @@ class Chunk(object):
             current_row = values[row_offset:row_offset+8]
 
             row = []
+            columnpos = 0
             for column in current_row:
                 row.append(tile.Tile(self, column))
+                columnpos += 1
             self.rows.append(row)
 
     def toSVG(self, xml):
@@ -35,7 +38,7 @@ class Chunk(object):
         for row in self.rows:
             columnpos = 0
             for column in row:
-                with xml.g(transform="translate(%d, %d)" % (columnpos*16, rowpos*16)):
+                with xml.g(transform="translate(%d, %d)" % (columnpos*16, rowpos*16), id="tile_c%x_%x_%x" % (self.position, columnpos, rowpos)):
                     column.toSVG(xml)
                 columnpos += 1
             rowpos += 1

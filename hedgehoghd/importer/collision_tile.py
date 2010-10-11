@@ -26,14 +26,18 @@ class CollisionTile(object):
 
 
     def toSVG(self, xml):
-        path_string = "M 0,0 "
         column_pos = 0
         first = True
+        path_string = ""
+
+        with xml.rect(x="0", y="0", width="16", height="16", style="fill:none;stroke:#7f7f7f"):
+            pass
 
         # TODO: there can be breaks in the path, which are not handled here.  really need to start a new path element.
         for column in self.columns:
             fill, height = column
             if(height == 0):
+                column_pos += 1
                 continue
             if(first):
                 path_string += "M %d,%d " % (column_pos, 16 - height)

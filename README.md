@@ -24,7 +24,7 @@ acquired with:
 
 To produce collision geometry SVG from Sonic 2, run from the root of the HedgehogHD repo:
 
-    hedgehoghd/importer/hedgehoghd_import.py ~/path/to/sonic/retro/split/disassembly ~/svg_output/
+    hedgehoghd/importer/hedgehoghd_import.py ~/path/to/asm_svn ~/svg_output/
 
 To produce HTML documentation:
 

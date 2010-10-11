@@ -82,7 +82,8 @@ class DeathEggZone(zone.Zone):
     chunk_array = "CPZ_DEZ"
 
 class Sonic2(object):
-    def __init__(self, s2_split_disassembly_dir):
+    def __init__(self, s2_split_disassembly_dir, hhd_game_path):
+        self.hhd_game_path = hhd_game_path
         self.s2_split_disassembly_dir = s2_split_disassembly_dir
         if not os.path.isdir(s2_split_disassembly_dir):
             raise Exception("%s: invalid Sonic 2 split disassembly directory!" % s2_split_disassembly_dir)
@@ -130,7 +131,7 @@ class Sonic2(object):
             with collxml.g(id="collision2", transform="translate(0, 20)"):
                 self.coll2.toSVG(collxml)
 
-        coll_svg_fd = open("/tmp/collision.svg", "wb")
+        coll_svg_fd = open(os.path.join(self.hhd_game_path, "collision.svg"), "wb")
         coll_svg_fd.write(str(collxml))
         coll_svg_fd.close()
 

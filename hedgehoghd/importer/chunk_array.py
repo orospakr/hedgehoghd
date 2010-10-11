@@ -1,10 +1,11 @@
 import logging
+import os.path
 from xmlwitch import builder
 import chunk
 import kosinski
 
 class ChunkArray(object):
-    '''Array of Chunks, typically used by either one or two Zones.
+    '''Array of Chunks, typically used by either one or two Zones
 
     As found in mappings/128x128, Kosinski compressed.
 
@@ -50,7 +51,7 @@ class ChunkArray(object):
                         'width':"%d" % (128*len(self.chunks)), 'height':"%d" % (128)}):
             self.toSVG(chunk_xml)
         
-        chunk_xml_fd = open("/tmp/%s_chunks.svg" % self.name, "wb")
+        chunk_xml_fd = open(os.path.join(self.sonic2.hhd_game_path, "%s_chunks.svg" % self.name), "wb")
         chunk_xml_fd.write(str(chunk_xml))
         chunk_xml_fd.close()
 

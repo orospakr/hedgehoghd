@@ -94,10 +94,10 @@ class Sonic2(object):
         self.coll1 = collision_array.CollisionArray(coll1_fd.read())
         coll1_fd.close()
 
-        logging.info("... 2")
-        coll2_fd = open(os.path.join(s2_split_disassembly_dir, "collision", "Collision array 2.bin"), "rb")
-        self.coll2 = collision_array.CollisionArray(coll2_fd.read())
-        coll2_fd.close()
+        # logging.info("... 2")
+        # coll2_fd = open(os.path.join(s2_split_disassembly_dir, "collision", "Collision array 2.bin"), "rb")
+        # self.coll2 = collision_array.CollisionArray(coll2_fd.read())
+        # coll2_fd.close()
 
         self.chunk_arrays = {}
 
@@ -127,8 +127,8 @@ class Sonic2(object):
                         'width':"%d" % ((16*len(self.coll1.tiles)) + (4*(len(self.coll1.tiles)))), 'height':"%d" % (32 + 4)}):
             with collxml.g(id="collision1"):
                 self.coll1.toSVG(collxml)
-            with collxml.g(id="collision2", transform="translate(0, 20)"):
-                self.coll2.toSVG(collxml)
+            # with collxml.g(id="collision2", transform="translate(0, 20)"):
+            #     self.coll2.toSVG(collxml)
 
         coll_svg_fd = open("/tmp/collision.svg", "wb")
         coll_svg_fd.write(str(collxml))

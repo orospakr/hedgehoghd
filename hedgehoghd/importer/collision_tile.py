@@ -1,3 +1,5 @@
+import logging
+
 class CollisionTile(object):
     '''16x16 Collision Shape Tile
 
@@ -31,31 +33,78 @@ class CollisionTile(object):
     def toSVG(self, xml):
         column_pos = 0
         first = True
-        self.path_string = ""
 
         with xml.rect(x="0", y="0", width="16", height="16", style="fill:none;stroke:#7f7f7f"):
             pass
 
-        def prepend(data):
-            self.path_string = "%s%s" % (data, self.path_string)
+        last_top = None
+        last_bottom = None
 
-        def append(data):
-            self.path_string = "%s%s" % (self.path_string, data)
+        path_entries = []
 
-        # TODO: there can be breaks in the path, which are not handled here.  really need to start a new path element.
+        def prepend(movetype, coordpair):
+            path_entries.insert(0, [movetype, coordpair])
+
+        def append(movetype, coordpair):
+            path_entries.append([movetype, coordpair])
+
         for column in self.columns:
+            # when we hit the first column with data,
+            # create two cursors that will go separate directions ('top' and 'bottom')
+            # the cursor should remember its height level so it can avoid putting extra path entries
+            # above cursor will prepend points, below cursor will append them.
+            # above cursor is reponsible for prepending the M point on the path, on its last entry.
+
             fill, height = column
-            if(height == None):
-                column_pos += 1
-                continue
-            if(first):
-                self.path_string += "M %d,%d " % (column_pos, 15 - height)
-                first = False
-            else:
-                self.path_string += "L %d,%d " % (column_pos, 15 - height)
+
+            def current_bottom():
+                if(fill == 1):
+                    # fill from top.
+                    return height
+                else:
+                    # fill from bottom.
+                    return 0
+
+            def current_top():
+                if(fill == 1):
+                    # fill from top
+                    return 15
+                else:
+                    # fill from bottom.
+                    return height
+
+            on_last_column = column_pos == 15
+
+            if(height != None):
+                # -15 because the SVG origin is top-left, whereas my data is bottom-left.
+                if((current_bottom() != last_bottom) or on_last_column):
+                    append('L', '%d, %d' % (column_pos, 15 - current_bottom()))
+                    last_bottom = current_bottom()
+
+                if((current_top() != last_top) or on_last_column):
+                    prepend('L', '%d, %d' % (column_pos, 15 - current_top()))
+                    last_top = current_top()
+            
+            # last column!
+            if(on_last_column):
+                if(len(path_entries) < 4):
+                    # this log message is surpressed down to debug level because it just gets to spammy.
+                    # no one cares about those crappy blocks anyway. :)
+                    logging.debug("This collision tile cannot be traced.  Skipping. %d" % len(path_entries))
+                    return
+
+                path_entries[0][0] = 'M'
+                # we need a lineto for that last segment or the stroke won't happen there
+                path_entries.append(['L', path_entries[0][1]])
+                path_entries.append(['Q', ''])
+                break
+
             column_pos += 1
 
-        with xml.path(d=self.path_string,
-                      style="fill:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"):
+        path_string = ""
+        for node in path_entries:
+            path_string += "%s%s " % (node[0], node[1])
+
+        with xml.path(d=path_string,
+                      style="fill:#00ff00;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"):
             pass
-        

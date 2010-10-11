@@ -29,7 +29,7 @@ class CollisionArray(object):
         for i in range(0, number_of_tiles):
             logging.debug("Collision array block #%x" % i)
             row = arr[i*16:(i*16) + 16]
-            # logging.debug(repr(row))
+            logging.debug(repr(row))
             self.tiles.append(collision_tile.CollisionTile(row))
 
     def toSVG(self, xml):

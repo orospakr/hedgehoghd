@@ -94,10 +94,10 @@ class Sonic2(object):
         self.coll1 = collision_array.CollisionArray(coll1_fd.read())
         coll1_fd.close()
 
-        # logging.info("... 2")
-        # coll2_fd = open(os.path.join(s2_split_disassembly_dir, "collision", "Collision array 2.bin"), "rb")
-        # self.coll2 = collision_array.CollisionArray(coll2_fd.read())
-        # coll2_fd.close()
+        logging.info("... 2 (I don't really use it, but whatever...")
+        coll2_fd = open(os.path.join(s2_split_disassembly_dir, "collision", "Collision array 2.bin"), "rb")
+        self.coll2 = collision_array.CollisionArray(coll2_fd.read())
+        coll2_fd.close()
 
         self.chunk_arrays = {}
 
@@ -127,31 +127,18 @@ class Sonic2(object):
                         'width':"%d" % ((16*len(self.coll1.tiles)) + (4*(len(self.coll1.tiles)))), 'height':"%d" % (32 + 4)}):
             with collxml.g(id="collision1"):
                 self.coll1.toSVG(collxml)
-            # with collxml.g(id="collision2", transform="translate(0, 20)"):
-            #     self.coll2.toSVG(collxml)
+            with collxml.g(id="collision2", transform="translate(0, 20)"):
+                self.coll2.toSVG(collxml)
 
         coll_svg_fd = open("/tmp/collision.svg", "wb")
         coll_svg_fd.write(str(collxml))
         coll_svg_fd.close()
 
-        ehz_chunk_xml = builder(version="1.0", encoding="utf-8")
-        with ehz_chunk_xml.svg(**{'xmlns:dc':"http://purl.org/dc/elements/1.1/",
-                        'xmlns:rdf':"http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-                        'xmlns:svg':"http://www.w3.org/2000/svg",
-                        'xmlns':"http://www.w3.org/2000/svg",
-                        'version':"1.1",
-                        'width':"%d" % (128*len(self.chunk_arrays["EHZ_HTZ"].chunks)), 'height':"%d" % (128)}):
-            self.chunk_arrays["EHZ_HTZ"].toSVG(ehz_chunk_xml)
-        
-        ehz_chunk_xml_fd = open("/tmp/ehz_chunks.svg", "wb")
-        ehz_chunk_xml_fd.write(str(ehz_chunk_xml))
-        ehz_chunk_xml_fd.close()
-
         # TODO instantiate each Zone, which will itself instantiate each act
         # they will look up chunks in the chunkarrays above.
 
     def loadChunkArray(self, name):
-        logging.info("Loading 128x128 chunk array for: %s" % name)
+        logging.info("Loading 128x128 chunk array: %s" % name)
         collision_index_name = name
         if(name == "CPZ_DEZ"):
             collision_index_name = "CPZ and DEZ"
@@ -175,5 +162,7 @@ class Sonic2(object):
             c_s_idx_fd.close()
                                         
         chunk_fd = open(os.path.join(self.s2_split_disassembly_dir, "mappings", "128x128", "%s.bin" % name), "rb")
-        self.chunk_arrays[name] = chunk_array.ChunkArray(self, name, chunk_fd.read(), primary_index, secondary_index)
+        ca = chunk_array.ChunkArray(self, name, chunk_fd.read(), primary_index, secondary_index)
+        self.chunk_arrays[name] = ca
         chunk_fd.close()
+        ca.writeSVG()

@@ -88,7 +88,7 @@ class CollisionTile(object):
             # last column!
             if(on_last_column):
                 if(len(path_entries) < 4):
-                    # this log message is surpressed down to debug level because it just gets to spammy.
+                    # this log message is surpressed down to debug level because it just gets too spammy.
                     # no one cares about those crappy blocks anyway. :)
                     logging.debug("This collision tile cannot be traced.  Skipping. %d" % len(path_entries))
                     return

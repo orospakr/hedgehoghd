@@ -2,9 +2,17 @@
 
 #include <QSvgRenderer>
 
+#include <QImage>
+
 int main(int argc, char** argv) {
     QApplication app(argc, argv);
-    QSvgRenderer test();
+    QImage woot((256 * 128) + (4 * 256), 4 + (128 * 2), QImage::Format_ARGB32);
+    QSvgRenderer test(QLatin1String("/home/orospakr/hhd_test/collision.svg"), 0);
+    QPainter painter(&woot);
+
+    test.render(&painter);
+
+    woot.save("/tmp/out.png", 0, -1);
 
     // 1. load an svg file
     // 2. get it inside a GraphicsView
@@ -35,5 +43,6 @@ int main(int argc, char** argv) {
     // using this, get some basic input working and allow the user to move the the "viewport"/perspective matrix
 
 
-    return app.exec();
+    //return app.exec();
+    return 0;
 }

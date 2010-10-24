@@ -19,6 +19,7 @@
 import array
 import logging
 import os.path
+import os
 import struct
 
 import kosinski
@@ -97,9 +98,18 @@ class DeathEggZone(zone.Zone):
     code = "DEZ"
     chunk_array = "CPZ_DEZ"
 
+def mkdirs(path):
+    try:
+        os.makedirs(path)
+    except OSError, e:
+        if e.errno != 17:
+            logging.error("Couldn't create output directory: %s" % str(e))  
+            exit(-1)
+
 class Sonic2(object):
     def __init__(self, s2_split_disassembly_dir, hhd_game_path):
         self.hhd_game_path = hhd_game_path
+        mkdirs(hhd_game_path)
         self.s2_split_disassembly_dir = s2_split_disassembly_dir
         if not os.path.isdir(s2_split_disassembly_dir):
             raise Exception("%s: invalid Sonic 2 split disassembly directory!" % s2_split_disassembly_dir)
@@ -111,7 +121,7 @@ class Sonic2(object):
         self.coll1 = collision_array.CollisionArray(coll1_fd.read())
         coll1_fd.close()
 
-        logging.info("... 2 (I don't really use it, but whatever...")
+        logging.info("... 2 (I don't really use it, but whatever...)")
         coll2_fd = open(os.path.join(s2_split_disassembly_dir, "collision", "Collision array 2.bin"), "rb")
         self.coll2 = collision_array.CollisionArray(coll2_fd.read())
         coll2_fd.close()
@@ -151,6 +161,10 @@ class Sonic2(object):
         coll_svg_fd.write(str(collxml))
         coll_svg_fd.close()
 
+        coll1_dir = os.path.join(self.hhd_game_path, "collision")
+        mkdirs(coll1_dir)
+        self.coll1.writeSVGs(coll1_dir)
+
         # TODO instantiate each Zone, which will itself instantiate each act
         # they will look up chunks in the chunkarrays above.
 
@@ -182,4 +196,8 @@ class Sonic2(object):
         ca = chunk_array.ChunkArray(self, name, chunk_fd.read(), primary_index, secondary_index)
         self.chunk_arrays[name] = ca
         chunk_fd.close()
-        ca.writeSVG()
+        svg_path = os.path.join(self.hhd_game_path, "chunk", name)
+        mkdirs(svg_path)
+        ca.writeSVGs(svg_path)
+
+#        ca.writeSVG()

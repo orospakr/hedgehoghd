@@ -16,6 +16,7 @@
 
 import array
 import logging
+import os
 
 import collision_tile
 
@@ -52,6 +53,12 @@ class CollisionArray(object):
             row = arr[i*16:(i*16) + 16]
             logging.debug(repr(row))
             self.tiles.append(collision_tile.CollisionTile(row))
+
+    def writeSVGs(self, path):
+        idx = 0
+        for tile in self.tiles:
+            tile.writeSVG(os.path.join(path, "%02x.svg" % idx))
+            idx += 1
 
     def toSVG(self, xml):
         tilecount = 0

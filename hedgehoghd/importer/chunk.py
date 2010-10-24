@@ -18,6 +18,7 @@ import logging
 import struct
 
 import tile
+from xmlwitch import builder
 
 class Chunk(object):
     '''128x128 Chunks as mapped into LevelLayouts' backgrounds and foregrounds
@@ -47,6 +48,23 @@ class Chunk(object):
                 row.append(tile.Tile(self, column))
                 columnpos += 1
             self.rows.append(row)
+
+    def writeSVG(self, filename):
+        svg = builder(version="1.0", encoding="utf-8")
+
+        with svg.svg(**{'xmlns:dc':"http://purl.org/dc/elements/1.1/",
+                        'xmlns:rdf':"http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+                        'xmlns:svg':"http://www.w3.org/2000/svg",
+                        'xmlns':"http://www.w3.org/2000/svg",
+                        'version':"1.1",
+                        'width': "128",
+                        'height': "128"}):
+
+            self.toSVG(svg)
+
+        svg_fd = open(filename, "wb")
+        svg_fd.write(str(svg))
+        svg_fd.close()
 
     def toSVG(self, xml):
         rowpos = 0

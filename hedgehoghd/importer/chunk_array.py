@@ -55,6 +55,12 @@ class ChunkArray(object):
             chunk_no += 1
             block_data = bm[block*128:(block*128) + 128]
             self.chunks.append(chunk.Chunk(self, block_data, chunk_no))
+
+    def writeSVGs(self, path):
+        idx = 0
+        for chunk in self.chunks:
+            chunk.writeSVG(os.path.join(path, "%02x.svg" % idx))
+            idx += 1
     
     def writeSVG(self):
         logging.info("Writing SVG for chunk array: %s" % self.name)

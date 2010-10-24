@@ -16,6 +16,8 @@
 
 import logging
 
+from xmlwitch import builder
+
 class CollisionTile(object):
     '''16x16 Collision Shape Tile
 
@@ -53,6 +55,23 @@ class CollisionTile(object):
                 height = (0b00011111 & column_byte)
 
             self.columns.append((fill, height))
+
+    def writeSVG(self, filename):
+        collxml = builder(version="1.0", encoding="utf-8")
+
+        with collxml.svg(**{'xmlns:dc':"http://purl.org/dc/elements/1.1/",
+                            'xmlns:rdf':"http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+                            'xmlns:svg':"http://www.w3.org/2000/svg",
+                            'xmlns':"http://www.w3.org/2000/svg",
+                            'version':"1.1",
+                            'width': "16",
+                            'height': "16"}):
+                         
+            self.toSVG(collxml)
+
+        svg_fd = open(filename, "wb")
+        svg_fd.write(str(collxml))
+        svg_fd.close()
 
     def toSVG(self, xml):
         column_pos = 0

@@ -4,5 +4,6 @@
 
 set(CMAKE_CXX_FLAGS "-Wall -g")
 
-add_subdirectory (editor)
+
 add_subdirectory (engine)
+add_subdirectory (editor)

@@ -21,6 +21,7 @@ import logging
 import os.path
 import os
 import struct
+import json
 
 import kosinski
 
@@ -128,47 +129,61 @@ class Sonic2(object):
 
         self.chunk_arrays = {}
 
+        ca_id = 0
         for cname in ["ARZ", "CNZ", "CPZ_DEZ", "EHZ_HTZ", "MCZ", "OOZ", "MTZ", "WFZ_SCZ"]:
-            self.loadChunkArray(cname)
+            self.loadChunkArray(cname, ca_id)
+            ca_id += 1
         
-        self.ehz = EmeraldHillZone(self)
-        self.cpz = ChemicalPlantZone(self)
-        self.arz = AquaticRuinZone(self)
-        self.cnz = CasinoNightZone(self)
-        self.htz = HillTopZone(self)
-        self.mcz = MysticCaveZone(self)
-        self.ooz = OilOceanZone(self)
-        self.mtz = MetropolisZone(self)
-        self.scz = SkyChaseZone(self)
-        self.wfz = WingFortressZone(self)
-        self.dez = DeathEggZone(self)
+        self.zones = {}
+        self.zones["ehz"] = EmeraldHillZone(self, self.chunk_arrays["EHZ_HTZ"])
+        self.zones["cpz"] = ChemicalPlantZone(self, self.chunk_arrays["CPZ_DEZ"])
+        self.zones["arz"] = AquaticRuinZone(self, self.chunk_arrays["ARZ"])
+        self.zones["cnz"] = CasinoNightZone(self, self.chunk_arrays["CNZ"])
+        self.zones["htz"] = HillTopZone(self, self.chunk_arrays["EHZ_HTZ"])
+        self.zones["mcz"] = MysticCaveZone(self, self.chunk_arrays["MCZ"])
+        self.zones["ooz"] = OilOceanZone(self, self.chunk_arrays["OOZ"])
+        self.zones["mtz"] = MetropolisZone(self, self.chunk_arrays["MTZ"])
+        self.zones["scz"] = SkyChaseZone(self, self.chunk_arrays["WFZ_SCZ"])
+        self.zones["wfz"] = WingFortressZone(self, self.chunk_arrays["WFZ_SCZ"])
+        self.zones["dez"] = DeathEggZone(self, self.chunk_arrays["CPZ_DEZ"])
+
+        for zc in self.zones.keys():
+            z = self.zones[zc]
+            z.writeHHD(os.path.join(self.hhd_game_path, "zones"))
 
         # self.ehz.toSVG("/tmp/ehz.svg")
-        collxml = builder(version="1.0", encoding="utf-8")
 
-        with collxml.svg(**{'xmlns:dc':"http://purl.org/dc/elements/1.1/",
-                        'xmlns:rdf':"http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-                        'xmlns:svg':"http://www.w3.org/2000/svg",
-                        'xmlns':"http://www.w3.org/2000/svg",
-                        'version':"1.1",
-                        'width':"%d" % ((16*len(self.coll1.tiles)) + (4*(len(self.coll1.tiles)))), 'height':"%d" % (32 + 4)}):
-            with collxml.g(id="collision1"):
-                self.coll1.toSVG(collxml)
-            with collxml.g(id="collision2", transform="translate(0, 20)"):
-                self.coll2.toSVG(collxml)
 
-        coll_svg_fd = open(os.path.join(self.hhd_game_path, "collision.svg"), "wb")
-        coll_svg_fd.write(str(collxml))
-        coll_svg_fd.close()
 
-        coll1_dir = os.path.join(self.hhd_game_path, "collision")
-        mkdirs(coll1_dir)
-        self.coll1.writeSVGs(coll1_dir)
+        # collxml = builder(version="1.0", encoding="utf-8")
+
+        # with collxml.svg(**{'xmlns:dc':"http://purl.org/dc/elements/1.1/",
+        #                 'xmlns:rdf':"http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+        #                 'xmlns:svg':"http://www.w3.org/2000/svg",
+        #                 'xmlns':"http://www.w3.org/2000/svg",
+        #                 'version':"1.1",
+        #                 'width':"%d" % ((16*len(self.coll1.tiles)) + (4*(len(self.coll1.tiles)))), 'height':"%d" % (32 + 4)}):
+        #     with collxml.g(id="collision1"):
+        #         self.coll1.toSVG(collxml)
+        #     with collxml.g(id="collision2", transform="translate(0, 20)"):
+        #         self.coll2.toSVG(collxml)
+
+        # coll_svg_fd = open(os.path.join(self.hhd_game_path, "collision.svg"), "wb")
+        # coll_svg_fd.write(str(collxml))
+        # coll_svg_fd.close()
+
+        # coll1_dir = os.path.join(self.hhd_game_path, "collision")
+        # mkdirs(coll1_dir)
+        # self.coll1.writeSVGs(coll1_dir)
+
+        jmdfn = open(os.path.join(self.hhd_game_path, "game.json"), "wb")
+        jmdfn.write(json.dumps(self.jsonMetadata()))
+        jmdfn.close()
 
         # TODO instantiate each Zone, which will itself instantiate each act
         # they will look up chunks in the chunkarrays above.
 
-    def loadChunkArray(self, name):
+    def loadChunkArray(self, name, c_id):
         logging.info("Loading 128x128 chunk array: %s" % name)
         collision_index_name = name
         if(name == "CPZ_DEZ"):
@@ -177,7 +192,6 @@ class Sonic2(object):
             collision_index_name = "EHZ and HTZ"
         elif(name == "WFZ_SCZ"):
             collision_index_name = "WFZ and SCZ"
-        
 
         index_fn_pattern = os.path.join(self.s2_split_disassembly_dir, "collision", "%s %s 16x16 collision index.bin" % (collision_index_name, "%s"))
         
@@ -193,11 +207,30 @@ class Sonic2(object):
             c_s_idx_fd.close()
                                         
         chunk_fd = open(os.path.join(self.s2_split_disassembly_dir, "mappings", "128x128", "%s.bin" % name), "rb")
-        ca = chunk_array.ChunkArray(self, name, chunk_fd.read(), primary_index, secondary_index)
+        ca = chunk_array.ChunkArray(self, name, c_id, chunk_fd.read(), primary_index, secondary_index)
         self.chunk_arrays[name] = ca
         chunk_fd.close()
-        svg_path = os.path.join(self.hhd_game_path, "chunk", name)
+        svg_path = os.path.join(self.hhd_game_path, "chunks", str(c_id))
         mkdirs(svg_path)
         ca.writeSVGs(svg_path)
 
-#        ca.writeSVG()
+    def jsonMetadata(self):
+        def collect_zone_metadata():
+            results = []
+            for code, z in self.zones.iteritems():
+                results.append(z.jsonMetadata())
+            return results
+        def collect_chunk_array_metadata():
+            results = []
+            for name, ca in self.chunk_arrays.iteritems():
+                results.append(ca.jsonMetadata())
+            return results
+        md = {"title": "Sonic the Hedgehog 2",
+              "copyrights": [{"date": "1992",
+                             "owner": "Sega Enterprises",
+                             "license": "All Rights Reserved"}],
+              "hhd_version": 0,
+              "zones": collect_zone_metadata(),
+              "chunksets": collect_chunk_array_metadata()
+              }
+        return md

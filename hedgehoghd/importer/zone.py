@@ -17,10 +17,10 @@
 import os.path
 import logging
 
+import sonic2
 import level_layout
 
 from xmlwitch import builder
-
 
 class Zone(object):
     '''A Zone!
@@ -30,63 +30,54 @@ class Zone(object):
     This class is inherited from in order to create a definition of a
     specific Zone.
     '''
-    def __init__(self, sonic2):
+    def __init__(self, sonic2, chunk_array):
+        if chunk_array is None:
+            logging.error("What? Can't give a zone an undefined chunk array!")
+        self.chunk_array = chunk_array
         # load LevelMaps from level/layout for each act
         logging.info("Loading %s Zone..." % self.title)
         self.act_layouts = []
         if(self.acts == 1):
             # only one act, disasm names them directly.
             fd = open(os.path.join(sonic2.s2_split_disassembly_dir, "level", "layout", "%s.bin" % self.code), "rb")
-            self.act_layouts.append(level_layout.LevelLayout(sonic2.chunk_arrays[self.chunk_array], fd.read()))
+            self.act_layouts.append(level_layout.LevelLayout(self.chunk_array, fd.read()))
             fd.close()
         else:
             for act in range(0, self.acts):
                 logging.info("... Act %d" % (act + 1))
-                fd = open(os.path.join(sonic2.s2_split_disassembly_dir, "level", "layout", "%s_%d.bin" % (self.code, act + 1)), "rb") # acts are numbered from 1
-                self.act_layouts.append(level_layout.LevelLayout(sonic2.chunk_arrays[self.chunk_array], fd.read()))
+                fd = open(os.path.join(sonic2.s2_split_disassembly_dir, "level", "layout", "%s_%d.bin" % (self.code, act + 1)), "rb") # acts are numbered from 1 in the disasm
+                self.act_layouts.append(level_layout.LevelLayout(self.chunk_array, fd.read()))
                 fd.close()
 
-    def toSVG(self, filename):
+    def jsonMetadata(self):
+        return {"title": self.title,
+                "code": self.code,
+                "acts": self.acts,
+                "chunks_id": self.chunk_array.c_id}
 
-        xml = builder(version="1.0", encoding="utf-8")
+    def writeHHD(self, path):
+        # have my levellayouts write out their HHD representations
+        zone_path = os.path.join(path, self.code)
+        sonic2.mkdirs(zone_path)
+        for act in range(0, self.acts):
+            act_path = os.path.join(zone_path, str(act))
+            sonic2.mkdirs(act_path)
+            self.act_layouts[act].writeHHDMaps(act_path)
 
-        # just doing Act 1 for now.
-        with xml.svg(**{'xmlns:dc':"http://purl.org/dc/elements/1.1/",
-                        'xmlns:rdf':"http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-                        'xmlns:svg':"http://www.w3.org/2000/svg",
-                        'xmlns':"http://www.w3.org/2000/svg",
-                        'version':"1.1",
-                        'width':"%d" % (128*128), 'height':"%d" % (128*16),
-                        'id':self.code}):
-            with xml.g(id="act1"):
-                 self.act_layouts[0].toSVG(xml)
+    # def toSVG(self, filename):
+    #     xml = builder(version="1.0", encoding="utf-8")
 
+    #     # just doing Act 1 for now.
+    #     with xml.svg(**{'xmlns:dc':"http://purl.org/dc/elements/1.1/",
+    #                     'xmlns:rdf':"http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    #                     'xmlns:svg':"http://www.w3.org/2000/svg",
+    #                     'xmlns':"http://www.w3.org/2000/svg",
+    #                     'version':"1.1",
+    #                     'width':"%d" % (128*128), 'height':"%d" % (128*16),
+    #                     'id':self.code}):
+    #         with xml.g(id="act1"):
+    #              self.act_layouts[0].toSVG(xml)
 
-        
-
-        fd = open(filename, "wb")
-        fd.write(str(xml))
-        fd.close()
-#        svg = cairo.SVGSurface(filename, 128*128, 128*16) 
-#        cr = cairo.Context(svg)
-        # cr.translate(512, 512)
-        # cr.set_line_width(1)
-        # cr.set_source_rgb(0, 0, 0)
-        # cr.rectangle(0, 0, 128, 128)
-        # cr.fill()
-
-        # cr.translate(512, 512)
-        # cr.set_line_width(1)
-        # cr.set_source_rgb(0, 0, 0)
-        # cr.rectangle(0, 0, 128, 128)
-        # cr.fill()
-
-        # cr.translate(-1024, -1024)
-        # cr.set_line_width(1)
-        # cr.set_source_rgb(255, 0, 255)
-        # cr.rectangle(0, 0, 128, 128)
-        # cr.fill()
-
-        # let's just do Act 1 for now
-        # self.act_layouts[0].toSVG(cr)
-#        cr.stroke()
+    #     fd = open(filename, "wb")
+    #     fd.write(str(xml))
+    #     fd.close()

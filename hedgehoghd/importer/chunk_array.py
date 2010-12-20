@@ -32,8 +32,9 @@ class ChunkArray(object):
     the Chunks this ChunkArray instantiates will need to look up their
     CollisionTiles through those.
     '''
-    def __init__(self, sonic2, name, data, primary_collision_index, secondary_collision_index):
+    def __init__(self, sonic2, name, c_id, data, primary_collision_index, secondary_collision_index):
         self.name = name
+        self.c_id = c_id
         self.sonic2 = sonic2
         self.primary_collision_index = primary_collision_index
         self.secondary_collision_index = secondary_collision_index
@@ -56,26 +57,31 @@ class ChunkArray(object):
             block_data = bm[block*128:(block*128) + 128]
             self.chunks.append(chunk.Chunk(self, block_data, chunk_no))
 
+    def jsonMetadata(self):
+        md = {"id": self.c_id, "name": self.name, "width": 128, "height": 128, "number": len(self.chunks)}
+        return md
+
     def writeSVGs(self, path):
         idx = 0
         for chunk in self.chunks:
-            chunk.writeSVG(os.path.join(path, "%02x.svg" % idx))
+            #chunk.writeSVG(os.path.join(path, "%02x.svg" % idx))
+            chunk.writeSVG(os.path.join(path, "%d.svg" % idx))
             idx += 1
-    
-    def writeSVG(self):
-        logging.info("Writing SVG for chunk array: %s" % self.name)
-        chunk_xml = builder(version="1.0", encoding="utf-8")
-        with chunk_xml.svg(**{'xmlns:dc':"http://purl.org/dc/elements/1.1/",
-                        'xmlns:rdf':"http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-                        'xmlns:svg':"http://www.w3.org/2000/svg",
-                        'xmlns':"http://www.w3.org/2000/svg",
-                        'version':"1.1",
-                        'width':"%d" % (128*len(self.chunks)), 'height':"%d" % (128)}):
-            self.toSVG(chunk_xml)
+
+    # def writeSVG(self):
+    #     logging.info("Writing SVG for chunk array: %s" % self.name)
+    #     chunk_xml = builder(version="1.0", encoding="utf-8")
+    #     with chunk_xml.svg(**{'xmlns:dc':"http://purl.org/dc/elements/1.1/",
+    #                     'xmlns:rdf':"http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    #                     'xmlns:svg':"http://www.w3.org/2000/svg",
+    #                     'xmlns':"http://www.w3.org/2000/svg",
+    #                     'version':"1.1",
+    #                     'width':"%d" % (128*len(self.chunks)), 'height':"%d" % (128)}):
+    #         self.toSVG(chunk_xml)
         
-        chunk_xml_fd = open(os.path.join(self.sonic2.hhd_game_path, "%s_chunks.svg" % self.name), "wb")
-        chunk_xml_fd.write(str(chunk_xml))
-        chunk_xml_fd.close()
+    #     chunk_xml_fd = open(os.path.join(self.sonic2.hhd_game_path, "%s_chunks.svg" % self.name), "wb")
+    #     chunk_xml_fd.write(str(chunk_xml))
+    #     chunk_xml_fd.close()
 
     def toSVG(self, xml):
         chunkpos = 0

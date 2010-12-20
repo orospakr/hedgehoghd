@@ -58,7 +58,7 @@ int main(int argc, char** argv) {
     // Basic skeleton would now be in place!
 
     // Editor's first mutation ability will probably be changing layout.  Not sure if SVG editing of chunks is feasible or even appropriate.
-    // Should my chunks even be SVG?  Maybe I should want a limited path format.  Maybe a limited (enforced) version of SVG is appropriate?
+    // Should my chunks even be SVG?  Maybe I should want a limited path format.  Maybe a limited (enforced) version of SVG is appropriate?  The presentation and physics definitions of Chunks should be still separate, I expect.
 
     // Engine should begin having an actual timed loop -- process next frame, use differences from initial timestamp to figure out how much
     // to sleep until flipping the buffers and resuming anew

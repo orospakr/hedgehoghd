@@ -16,6 +16,7 @@
 
 import array
 import logging
+import os.path
 
 import kosinski
 
@@ -30,6 +31,9 @@ class LevelLayout(object):
     foreground and background interleaved.  Each 1-byte cell addresses
     a 128x128 block out of the 256 available from the ChunkArray
     assigned to this Zone.
+
+    The background layer cannot be interacted with by the player.
+    Instead, it parallaxes behind.
     '''
     def __init__(self, chunk_array, data):
         self.chunk_array = chunk_array
@@ -55,7 +59,34 @@ class LevelLayout(object):
                 self.foreground.append(row)
             else:
                 self.background.append(row)
+    
+    def defWriteHHDLayoutFormat(self):
+        pass
 
+    def jsonMetadata(self):
+        hsh = {"layers": 2, "width":128, "height":16}
+        return hsh
+
+    def writeHHDMaps(self, path):
+        # HHD map format permits unlimited layers, but only 0 is the "foreground"
+        foreground_path = os.path.join(path, "0.map")
+        background_path = os.path.join(path, "1.map")
+        fgfd = open(foreground_path, "wb")
+        fgfd.write(self.genCSVMap(self.foreground))
+        fgfd.close()
+        bgfd = open(background_path, "wb")
+        bgfd.write(self.genCSVMap(self.background))
+        bgfd.close()
+
+    def genCSVMap(self, arrmap):
+        result = ""
+        for row in arrmap:
+            rowstr = ",".join(map(lambda x: str(x.position), row))
+            result += (rowstr + "\n")
+        return result
+        
+    # write out an SVG containing repeats of all the chunks in the appropriate places.
+    # not really feasible, do not use.
     def toSVG(self, xml):
         rowpos = 0
         for row in self.foreground:

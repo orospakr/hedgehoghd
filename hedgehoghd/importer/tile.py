@@ -30,7 +30,7 @@ class Tile(object):
     * horizontal and vertical flip bits
     * a reference to an artwork tile and collision block (through the
     index) by Tile ID collision solidity control bits, for the primary
-    and alternate layers
+    and alternate layers (aka, paths)
 
     # SSTT YXII IIII IIII
     '''
@@ -53,12 +53,15 @@ class Tile(object):
         # should really make better encapsulation.
         self.primary_collision = None
 
-        if(self.tile_index >= len(self.chunk.chunk_array.primary_collision_index.ids)):            
-            logging.warning("Tile index greater than length of collision index asked for.  available: %d, index: %d" % (len(self.chunk.chunk_array.primary_collision_index.ids), self.tile_index))
-        else:
-            col_id = self.chunk.chunk_array.primary_collision_index.ids[self.tile_index]
-
-            self.primary_collision = self.chunk.chunk_array.sonic2.coll1.tiles[col_id]
+        # if((self.tile_index >= len(self.chunk.chunk_array.primary_collision_index.ids)) or (self.tile_index >= len(self.chunk.chunk_array.secondary_collision_index.ids))):            
+        #     logging.warning("Tile index greater than length of collision index asked for.  available: %d/%d, index: %d" % (len(self.chunk.chunk_array.primary_collision_index.ids), len(self.chunk.chunk_array.primary_collision_index.ids), self.tile_index))
+        # else:
+        primary_col_id = self.chunk.chunk_array.primary_collision_index.ids[self.tile_index]
+        # TODO ick, this breaks encapsulation a bit too much
+        self.primary_collision = self.chunk.chunk_array.sonic2.coll1.tiles[primary_col_id]
+        if(self.chunk.chunk_array.secondary_collision_index is not None):
+            secondary_col_id = self.chunk.chunk_array.secondary_collision_index.ids[self.tile_index]
+            self.secondary_collision = self.chunk.chunk_array.sonic2.coll1.tiles[secondary_col_id]
         
     def toSVG(self, xml):
         if(self.primary_collision is not None):

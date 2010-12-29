@@ -17,6 +17,7 @@ set (HHD_ENGINE_CXX_SRCS
   chunk.cpp
   game.cpp
   zone.cpp
+  act.cpp
 )
 
 set (ENGINE_MOCS

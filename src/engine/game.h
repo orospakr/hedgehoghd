@@ -5,6 +5,7 @@
 #include <QString>
 
 #include "zone.h"
+#include "chunk.h"
 
 namespace HedgehogHD {
     namespace Engine {
@@ -16,7 +17,10 @@ namespace HedgehogHD {
         private:
             QVariantMap game_json;
             QString path;
-            QList<Zone*> zones;
+            QHash<QString, Zone*> zones;
+            QHash<int, Chunk*> chunks;
+            void loadChunks();
+            void loadZones();
         };
     }
 }

@@ -231,6 +231,6 @@ class Sonic2(object):
                              "license": "All Rights Reserved"}],
               "hhd_version": 0,
               "zones": collect_zone_metadata(),
-              "chunksets": collect_chunk_array_metadata()
+              "chunks": collect_chunk_array_metadata()
               }
         return md

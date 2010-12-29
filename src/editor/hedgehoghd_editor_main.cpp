@@ -32,9 +32,9 @@ int main(int argc, char** argv) {
 
     // woot.save("/tmp/out.png", 0, -1);
 
-    std::string mystring("HELLO\n");
+      std::string mystring("HELLO\n");
 
-    std::cout << mystring.substr(2,4);
+      std::cout << mystring.substr(2,4);
 
     // 1. load an svg file
     // 2. get it inside a GraphicsView

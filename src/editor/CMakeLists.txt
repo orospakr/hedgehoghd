@@ -45,4 +45,4 @@ qt4_wrap_ui (HHD_EDITOR_CXX_SRCS ${HHD_EDITOR_UIS})
 qt4_wrap_cpp (HHD_EDITOR_CXX_SRCS ${HHD_EDITOR_MOCS})
   
 add_executable (hedgehoghd_editor ${HHD_EDITOR_CXX_SRCS})
-target_link_libraries (hedgehoghd_editor ${QT_LIBRARIES} ${QJSON_LIBRARIES})
+target_link_libraries (hedgehoghd_editor hedgehoghd_engine ${QT_LIBRARIES} ${QJSON_LIBRARIES})

@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+   <FileVersion major="1" minor="6" />
+   <Project>
+      <Option title="hedgehoghd" />
+      <Option makefile_is_custom="1" />
+      <Option compiler="gcc" />
+      <Option virtualFolders="CMake Files\;CMake Files\src\;CMake Files\src\editor\;CMake Files\src\engine\;" />
+      <Build>
+      <Target title="all">
+         <Option working_dir="/home/orospakr/code/mine/hedgehoghd/build" />
+         <Option type="4" />
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/orospakr/code/mine/hedgehoghd/build/Makefile&quot; all" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/orospakr/code/mine/hedgehoghd/build/Makefile&quot; &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/orospakr/code/mine/hedgehoghd/build/Makefile&quot; clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/orospakr/code/mine/hedgehoghd/build/Makefile&quot; clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="rebuild_cache">
+         <Option working_dir="/home/orospakr/code/mine/hedgehoghd/build" />
+         <Option type="4" />
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/orospakr/code/mine/hedgehoghd/build/Makefile&quot; rebuild_cache" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/orospakr/code/mine/hedgehoghd/build/Makefile&quot; &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/orospakr/code/mine/hedgehoghd/build/Makefile&quot; clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/orospakr/code/mine/hedgehoghd/build/Makefile&quot; clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="hedgehoghd_engine">
+         <Option output="/home/orospakr/code/mine/hedgehoghd/build/src/engine/libhedgehoghd_engine.so" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/orospakr/code/mine/hedgehoghd/build/src/engine" />
+         <Option object_output="./" />
+         <Option type="3" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add directory="/usr/include/qt4" />
+            <Add directory="/usr/include/qt4/QtGui" />
+            <Add directory="/usr/include/qt4/QtCore" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/orospakr/code/mine/hedgehoghd/build/src/engine/Makefile&quot; hedgehoghd_engine" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/orospakr/code/mine/hedgehoghd/build/src/engine/Makefile&quot; &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/orospakr/code/mine/hedgehoghd/build/src/engine/Makefile&quot; clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/orospakr/code/mine/hedgehoghd/build/src/engine/Makefile&quot; clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="hedgehoghd_engine/fast">
+         <Option output="/home/orospakr/code/mine/hedgehoghd/build/src/engine/libhedgehoghd_engine.so" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/orospakr/code/mine/hedgehoghd/build/src/engine" />
+         <Option object_output="./" />
+         <Option type="3" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add directory="/usr/include/qt4" />
+            <Add directory="/usr/include/qt4/QtGui" />
+            <Add directory="/usr/include/qt4/QtCore" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/orospakr/code/mine/hedgehoghd/build/src/engine/Makefile&quot; hedgehoghd_engine/fast" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/orospakr/code/mine/hedgehoghd/build/src/engine/Makefile&quot; &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/orospakr/code/mine/hedgehoghd/build/src/engine/Makefile&quot; clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/orospakr/code/mine/hedgehoghd/build/src/engine/Makefile&quot; clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="hedgehoghd_editor">
+         <Option output="/home/orospakr/code/mine/hedgehoghd/build/src/editor/hedgehoghd_editor" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/orospakr/code/mine/hedgehoghd/build/src/editor" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add directory="/home/orospakr/code/mine/hedgehoghd" />
+            <Add directory="/home/orospakr/code/mine/hedgehoghd/src/editor" />
+            <Add directory="/home/orospakr/code/mine/hedgehoghd/build/src/editor" />
+            <Add directory="/home/orospakr/code/mine/hedgehoghd/src/engine" />
+            <Add directory="/usr/include/qt4" />
+            <Add directory="/usr/include/qt4/QtSvg" />
+            <Add directory="/usr/include/qt4/QtGui" />
+            <Add directory="/usr/include/qt4/QtCore" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/orospakr/code/mine/hedgehoghd/build/src/editor/Makefile&quot; hedgehoghd_editor" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/orospakr/code/mine/hedgehoghd/build/src/editor/Makefile&quot; &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/orospakr/code/mine/hedgehoghd/build/src/editor/Makefile&quot; clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/orospakr/code/mine/hedgehoghd/build/src/editor/Makefile&quot; clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="hedgehoghd_editor/fast">
+         <Option output="/home/orospakr/code/mine/hedgehoghd/build/src/editor/hedgehoghd_editor" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/orospakr/code/mine/hedgehoghd/build/src/editor" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add directory="/home/orospakr/code/mine/hedgehoghd" />
+            <Add directory="/home/orospakr/code/mine/hedgehoghd/src/editor" />
+            <Add directory="/home/orospakr/code/mine/hedgehoghd/build/src/editor" />
+            <Add directory="/home/orospakr/code/mine/hedgehoghd/src/engine" />
+            <Add directory="/usr/include/qt4" />
+            <Add directory="/usr/include/qt4/QtSvg" />
+            <Add directory="/usr/include/qt4/QtGui" />
+            <Add directory="/usr/include/qt4/QtCore" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/orospakr/code/mine/hedgehoghd/build/src/editor/Makefile&quot; hedgehoghd_editor/fast" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/orospakr/code/mine/hedgehoghd/build/src/editor/Makefile&quot; &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/orospakr/code/mine/hedgehoghd/build/src/editor/Makefile&quot; clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/orospakr/code/mine/hedgehoghd/build/src/editor/Makefile&quot; clean" />
+         </MakeCommands>
+      </Target>
+      </Build>
+      <Unit filename="/home/orospakr/code/mine/hedgehoghd/build/src/editor/moc_editor_application.cxx">
+      </Unit>
+      <Unit filename="/home/orospakr/code/mine/hedgehoghd/build/src/editor/moc_editor_window.cxx">
+      </Unit>
+      <Unit filename="/home/orospakr/code/mine/hedgehoghd/build/src/editor/moc_testdialog.cxx">
+      </Unit>
+      <Unit filename="/home/orospakr/code/mine/hedgehoghd/src/editor/editor_application.cpp">
+      </Unit>
+      <Unit filename="/home/orospakr/code/mine/hedgehoghd/src/editor/editor_window.cpp">
+      </Unit>
+      <Unit filename="/home/orospakr/code/mine/hedgehoghd/src/editor/hedgehoghd_editor_main.cpp">
+      </Unit>
+      <Unit filename="/home/orospakr/code/mine/hedgehoghd/src/editor/testdialog.cpp">
+      </Unit>
+      <Unit filename="/home/orospakr/code/mine/hedgehoghd/src/engine/chunk.cpp">
+      </Unit>
+      <Unit filename="/home/orospakr/code/mine/hedgehoghd/src/engine/game.cpp">
+      </Unit>
+      <Unit filename="/home/orospakr/code/mine/hedgehoghd/src/engine/zone.cpp">
+      </Unit>
+      <Unit filename="/home/orospakr/code/mine/hedgehoghd/build/src/editor/moc_editor_application.cxx.rule">
+      </Unit>
+      <Unit filename="/home/orospakr/code/mine/hedgehoghd/build/src/editor/moc_editor_window.cxx.rule">
+      </Unit>
+      <Unit filename="/home/orospakr/code/mine/hedgehoghd/build/src/editor/moc_testdialog.cxx.rule">
+      </Unit>
+      <Unit filename="/home/orospakr/code/mine/hedgehoghd/build/src/editor/ui_testdialog.h">
+      </Unit>
+      <Unit filename="/home/orospakr/code/mine/hedgehoghd/src/editor/editor_application.h">
+      </Unit>
+      <Unit filename="/home/orospakr/code/mine/hedgehoghd/src/editor/editor_window.h">
+      </Unit>
+      <Unit filename="/home/orospakr/code/mine/hedgehoghd/src/editor/testdialog.h">
+      </Unit>
+      <Unit filename="/home/orospakr/code/mine/hedgehoghd/src/editor/testdialog.ui">
+      </Unit>
+      <Unit filename="/home/orospakr/code/mine/hedgehoghd/src/engine/chunk.h">
+      </Unit>
+      <Unit filename="/home/orospakr/code/mine/hedgehoghd/src/engine/game.h">
+      </Unit>
+      <Unit filename="/home/orospakr/code/mine/hedgehoghd/src/engine/zone.h">
+      </Unit>
+      <Unit filename="/home/orospakr/code/mine/hedgehoghd/CMakeLists.txt">
+          <Option virtualFolder="CMake Files\" />
+      </Unit>
+      <Unit filename="/home/orospakr/code/mine/hedgehoghd/src/CMakeLists.txt">
+          <Option virtualFolder="CMake Files\src\" />
+      </Unit>
+      <Unit filename="/home/orospakr/code/mine/hedgehoghd/src/editor/CMakeLists.txt">
+          <Option virtualFolder="CMake Files\src\editor\" />
+      </Unit>
+      <Unit filename="/home/orospakr/code/mine/hedgehoghd/src/editor/CMakeLists.txt">
+          <Option virtualFolder="CMake Files\src\editor\" />
+      </Unit>
+      <Unit filename="/home/orospakr/code/mine/hedgehoghd/src/engine/CMakeLists.txt">
+          <Option virtualFolder="CMake Files\src\engine\" />
+      </Unit>
+      <Unit filename="/home/orospakr/code/mine/hedgehoghd/src/engine/CMakeLists.txt">
+          <Option virtualFolder="CMake Files\src\engine\" />
+      </Unit>
+   </Project>
+</CodeBlocks_project_file>

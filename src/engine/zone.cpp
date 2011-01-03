@@ -11,6 +11,7 @@ using HedgehogHD::Engine::Game;
 HedgehogHD::Engine::Zone::Zone(Game* game, QVariantMap json) {
     this->code = json["code"].toString();
     this->title = json["title"].toString();
+    this->game = game;
 
     int num_of_acts = json["acts"].toInt();
 

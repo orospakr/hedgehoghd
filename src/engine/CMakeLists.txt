@@ -18,6 +18,7 @@ set (HHD_ENGINE_CXX_SRCS
   game.cpp
   zone.cpp
   act.cpp
+  layout.cpp
 )
 
 set (ENGINE_MOCS

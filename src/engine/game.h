@@ -3,6 +3,7 @@
 
 #include <QVariantMap>
 #include <QString>
+#include <QDir>
 
 #include "zone.h"
 #include "chunk.h"
@@ -13,10 +14,13 @@ namespace HedgehogHD {
         public:
             Game(const char* path);
             ~Game();
-            
+
+            QDir zonesPath();
+            QDir chunksPath();
         private:
             QVariantMap game_json;
-            QString path;
+            QDir path;
+
             QHash<QString, Zone*> zones;
             QHash<int, Chunk*> chunks;
             void loadChunks();

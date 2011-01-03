@@ -1,12 +1,18 @@
 #ifndef _HHD_ENGINE_ACT_H_
 #define _HHD_ENGINE_ACT_H_
 
+#include <QByteArray>
+
+
 namespace HedgehogHD {
     namespace Engine {
-        class Act
-        {
+        class Zone;
+        class Act {
         public:
-            Act();
+            Act(Zone* zone, int number);
+        private:
+            Zone* zone;
+            int number;
         };
     }
 }

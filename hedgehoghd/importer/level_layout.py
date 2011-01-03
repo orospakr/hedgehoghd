@@ -33,7 +33,8 @@ class LevelLayout(object):
     assigned to this Zone.
 
     The background layer cannot be interacted with by the player.
-    Instead, it parallaxes behind.
+    Instead, it parallaxes behind (usually), controlled by the parallax
+    routines for that Zone.
     '''
     def __init__(self, chunk_array, data):
         self.chunk_array = chunk_array

@@ -2,6 +2,7 @@
 
 #include <QDebug>
 #include <QDir>
+#include <QIODevice>
 #include <QFile>
 
 #include <iostream>
@@ -11,15 +12,15 @@
 #include "game.h"
 #include "chunk.h"
 
-HedgehogHD::Engine::Game::Game(const char* path) {
+HedgehogHD::Engine::Game::Game(const char* path_) {
     bool ok;
     QJson::Parser parser;
 
-    this->path = path;
+    this->path = QDir(QString(path_));
 
-    qDebug() << "Loading HHD game from:" << this->path;
+    qDebug() << "Loading HHD game from:" << this->path.path();
     
-    QFile json_file(QDir(path).absoluteFilePath("game.json"));
+    QFile json_file(this->path.absoluteFilePath("game.json"));
     if(!json_file.open(QIODevice::ReadOnly)) {
       std::cout << "Problem reading from game JSON!";
     }
@@ -36,6 +37,14 @@ HedgehogHD::Engine::Game::Game(const char* path) {
     qDebug() << "Loaded Game:" << game_json["title"].toString();
     loadZones();
     loadChunks();
+}
+
+QDir HedgehogHD::Engine::Game::zonesPath() {
+    return path.absoluteFilePath("zones");
+}
+
+QDir HedgehogHD::Engine::Game::chunksPath() {
+    return path.absoluteFilePath("chunks");
 }
 
 void HedgehogHD::Engine::Game::loadZones() {

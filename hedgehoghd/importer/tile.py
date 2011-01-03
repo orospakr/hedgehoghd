@@ -19,8 +19,10 @@ import logging
 class Tile(object):
     '''16x16 Tile instance in a Chunk
 
+    These are never shared between chunks; they are used only once each.
+
     Contains the parameters describing the Collision, graphics Block,
-    and flip properties of a given 16x16 tile in a Chuink.  These are
+    and flip properties of a given 16x16 tile in a Chunk.  These are
     not shared by any other Chunks.
 
     64 of which exist in a Chunk, arranged in 8x8.

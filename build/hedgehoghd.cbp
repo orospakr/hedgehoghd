@@ -124,9 +124,13 @@
       </Unit>
       <Unit filename="/home/orospakr/code/mine/hedgehoghd/src/editor/testdialog.cpp">
       </Unit>
+      <Unit filename="/home/orospakr/code/mine/hedgehoghd/src/engine/act.cpp">
+      </Unit>
       <Unit filename="/home/orospakr/code/mine/hedgehoghd/src/engine/chunk.cpp">
       </Unit>
       <Unit filename="/home/orospakr/code/mine/hedgehoghd/src/engine/game.cpp">
+      </Unit>
+      <Unit filename="/home/orospakr/code/mine/hedgehoghd/src/engine/layout.cpp">
       </Unit>
       <Unit filename="/home/orospakr/code/mine/hedgehoghd/src/engine/zone.cpp">
       </Unit>
@@ -146,9 +150,13 @@
       </Unit>
       <Unit filename="/home/orospakr/code/mine/hedgehoghd/src/editor/testdialog.ui">
       </Unit>
+      <Unit filename="/home/orospakr/code/mine/hedgehoghd/src/engine/act.h">
+      </Unit>
       <Unit filename="/home/orospakr/code/mine/hedgehoghd/src/engine/chunk.h">
       </Unit>
       <Unit filename="/home/orospakr/code/mine/hedgehoghd/src/engine/game.h">
+      </Unit>
+      <Unit filename="/home/orospakr/code/mine/hedgehoghd/src/engine/layout.h">
       </Unit>
       <Unit filename="/home/orospakr/code/mine/hedgehoghd/src/engine/zone.h">
       </Unit>

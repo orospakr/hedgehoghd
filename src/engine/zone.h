@@ -2,6 +2,7 @@
 #define __HHD_ENGINE_ZONE_H_
 
 #include <QVariantMap>
+#include <QDir>
 
 #include "act.h"
 
@@ -14,11 +15,13 @@ namespace HedgehogHD {
         class Zone {
         public:
             Zone(Game* game, QVariantMap json);
+            Game* getGame();
+            QDir path();
         private:
             QString code;
             QString title;
             Game* game;
-            QList<Act> acts;
+            QList<Act*> acts;
         };
     }
 }

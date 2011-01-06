@@ -54,6 +54,9 @@ void HedgehogHD::Engine::Game::loadZones() {
     QVariantList zone_json_list = game_json["zones"].toList();
     QVariant item;
     foreach(item, zone_json_list) {
+        if(!item.canConvert<QVariantMap>()) {
+            qDebug() << "CAn't coerce Zone JSON into map!";
+        }
         QVariantMap map = item.toMap();
         Zone *zm = new Zone(this, map);
         this->zones[map["code"].toString()] = zm;

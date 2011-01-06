@@ -13,13 +13,17 @@ HedgehogHD::Engine::Zone::Zone(Game* game, QVariantMap json) {
     this->title = json["title"].toString();
     this->game = game;
 
-    int num_of_acts = json["acts"].toInt();
-
-    qDebug() << "Loaded Zone:" << this->code << "," << this->title << ", which has" << num_of_acts << "acts.";
-
-    for(int a = 0; a < num_of_acts; a++) {
-        acts << new Act(this, a);
+    QVariantList acts_json = json["acts"].toList();
+    QVariant act_json;
+    int act_no = 0;
+    foreach(act_json, acts_json) {
+        if(!act_json.canConvert<QVariantMap>()) {
+            qDebug() << "Can't coerce Act JSON into map!";
+        }
+        acts << new Act(this, act_json.toMap(), act_no);
     }
+
+    qDebug() << "Loaded Zone:" << this->code << "," << this->title << ", which has" << acts.length() << "acts.";
 }
 
 Game* HedgehogHD::Engine::Zone::getGame() {

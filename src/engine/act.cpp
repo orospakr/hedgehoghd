@@ -7,9 +7,11 @@
 #include "game.h"
 #include "layout.h"
 
-HedgehogHD::Engine::Act::Act(Zone* zone, int number) {
+HedgehogHD::Engine::Act::Act(Zone* zone, const QVariantMap& json, int number) {
     this->zone = zone;
     this->number = number;
+    width = json["width"].toInt();
+    height = json["height"].toInt();
     QDir map_dir = zone->path().absoluteFilePath(QString("%1").arg(number));
     QString map_path(map_dir.absoluteFilePath("0.map"));
     // using QIODevice::Text here so I don't have to worry about funky
@@ -21,4 +23,12 @@ HedgehogHD::Engine::Act::Act(Zone* zone, int number) {
     }
     QByteArray map_data = map_fd.readAll();
     Layout l(this, &map_data);
+}
+
+int HedgehogHD::Engine::Act::getHeight() {
+    return height;
+}
+
+int HedgehogHD::Engine::Act::getWidth() {
+    return width;
 }

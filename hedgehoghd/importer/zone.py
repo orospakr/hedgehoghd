@@ -49,10 +49,16 @@ class Zone(object):
                 self.act_layouts.append(level_layout.LevelLayout(self.chunk_array, fd.read()))
                 fd.close()
 
+    def actJsonMetadata(self):
+        result = []
+        for act in self.act_layouts:
+            result.append({"width":128, "height":16})
+        return result
+
     def jsonMetadata(self):
         return {"title": self.title,
                 "code": self.code,
-                "acts": self.acts,
+                "acts": self.actJsonMetadata(),
                 "chunks_id": self.chunk_array.c_id}
 
     def writeHHD(self, path):
